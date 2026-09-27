@@ -51,6 +51,6 @@ python3 /path/to/ui-showcase-motion/scripts/compare_videos.py reference.mp4 rend
   --fps 8 --duration 4 --reference-start 3 --render-start 5
 ```
 
-Output: paginated reference/render pairs, `report.json` with mean grayscale difference per sample, the largest inter-frame changes in the render (cut/glitch candidates), and duration/dimension differences. Aspect ratios are padded, start offsets align the passage, and nothing is time-stretched. Timestamps are requested seek times; for fast mechanics sample a short passage at source FPS and inspect full-resolution frames separately.
+Output: paginated reference/render pairs, `report.json` with mean grayscale difference per sample, the largest inter-frame changes in the render (cut/glitch candidates), and duration/dimension differences. Reported dimensions account for quarter-turn display rotation, matching the indexer and FFmpeg's autorotated samples. Aspect ratios are padded, start offsets align the passage, and nothing is time-stretched. Timestamps are requested seek times; for fast mechanics sample a short passage at source FPS and inspect full-resolution frames separately.
 
 Reading the score: it covers only the common sampled window and misses color shifts, fine text, motion between samples, and brief glitches. There's no pass threshold. Large changes may be intended cuts. For an adaptation with different copy, layout, or pacing, compare corresponding beats and don't revert a sound creative choice just because it differs more from the reference.

@@ -90,7 +90,7 @@ S2 pointer (touch indicator)
   target: [data-motion-id="filter-new"] center, minus indicator hotspot (36, 36)
   space: scene wrapper (inside camera)
   camera: push-in 84→108 (24 f), then still 108→189 through press and result
-  travel: 110→124 (14 f ≈ 450 ms), cubic-bezier(0.22, 1, 0.36, 1)
+  travel: 110→124 (14 f ≈ 467 ms at 30 fps), cubic-bezier(0.22, 1, 0.36, 1)
   pause: 124→130 (6 f)
   press: scale 1→0.9 over 130→133, back to 1 over 133→137; ripple 130→141
   result: chip state 130→135; cards reflow 136→151, spring 170/26/1
@@ -101,7 +101,7 @@ S2 pointer (touch indicator)
 
 | Boundary | Out state | In state | Overlap (tail of outgoing scene) | Owner of shared object |
 |---|---|---|---|---|
-| *S5→S6* | *Selected chip at rest* | *Chip fills frame as end-card background* | *[333, 345)* | *Overlay; source chip hidden at 333, end card shown at 345* |
+| *S5→S6* | *Filtered grid and benefit caption* | *Neutral mask covers UI; logo and CTA enter above it* | *[333, 345)* | *end-card-background layer; freeze filter-center anchor at 333, cover canvas by 344, retain background through 449* |
 
 ## 9. Assumptions & open decisions
 

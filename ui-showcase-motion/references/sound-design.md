@@ -86,6 +86,8 @@ python3 /path/to/ui-showcase-motion/scripts/audio_events.py /path/to/clip-or-fol
 
 Per clip it reports: hit candidates (time, band, rise, tail, a hint such as tick or thump), swells (whoosh or riser candidates), low/mid/high band energy, silences, loudness (LUFS, true peak), a tempo candidate, and picture changes paired with the nearest hit. The sheet shows the frame at each of the strongest hits above a band-energy timeline, with picture changes marked.
 
+`--ids` is optional and accepts validated indexer records with unique `R`-number IDs and paths. Without a matching record, the helper uses a sanitized filename plus a hash of the resolved source path, so equal filenames in different folders retain separate sheets. Use each record's `sheet` field to locate its image; do not construct filenames from the original stem.
+
 Reading it:
 
 - Everything is a **candidate**. The tool can't separate music from sound effects or say what made a sound; name sources only after listening.

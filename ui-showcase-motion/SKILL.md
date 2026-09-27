@@ -27,11 +27,14 @@ For an end-to-end request, run only the stages whose inputs are still missing �
 ## Output templates
 
 - [`assets/motion-plan-template.md`](assets/motion-plan-template.md) — the single living plan for a project. Copy it to the project as `motion-plan.md`, fill what's known, and update it in place.
-- [`assets/timeline.example.json`](assets/timeline.example.json) — the shape and conventions of the implementation contract (read its `$comment`). Keep its field names; add fields when a project needs them.
+- [`assets/timeline.example.json`](assets/timeline.example.json) — a complete 450-frame planning example and implementation contract (read its `$comment`). Keep its field names; add fields when a project needs them. Proposed sources and audio remain explicitly unresolved.
+- [`assets/motion-plan.example.md`](assets/motion-plan.example.md) — the matching filled plan, including all six scenes, transition ownership, open materials, build prompt, and verification plan.
 
 The plan template also holds the asset map (section 4) and the build prompt (section 10). Its italic example rows show the expected level of detail — replace or delete them.
 
 Scale to the ask: a quick concept can be a few rows of the plan; a full handoff fills both.
+
+Validate a complete timeline with [`scripts/validate_timeline.py`](scripts/validate_timeline.py); it checks structure, not whether the film works visually. See [handoff validation](references/build-handoff.md#validate-the-timeline).
 
 ## Evidence rule
 

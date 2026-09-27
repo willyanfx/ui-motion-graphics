@@ -8,6 +8,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from video_metadata import display_size
+
 
 def run(command):
     return subprocess.run(command, capture_output=True, check=True).stdout
@@ -16,8 +18,9 @@ def run(command):
 def probe(path):
     data = json.loads(run(['ffprobe', '-v', 'error', '-show_streams', '-show_format', '-of', 'json', str(path)]))
     video = next(s for s in data['streams'] if s['codec_type'] == 'video')
+    width, height, rotation = display_size(video)
     return {'path': str(path.resolve()), 'duration': float(video.get('duration') or data['format']['duration']),
-            'width': video['width'], 'height': video['height'], 'fps': video.get('avg_frame_rate')}
+            'width': width, 'height': height, 'rotation': rotation, 'fps': video.get('avg_frame_rate')}
 
 
 def main():

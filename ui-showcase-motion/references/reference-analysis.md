@@ -19,6 +19,8 @@ python3 /path/to/ui-showcase-motion/scripts/index_videos.py /path/to/reference.m
 
 Options: `--samples N` or `--fps F`, `--start`, `--end`, `--per-sheet` (default 24; dense runs paginate), `--workers`, `--keep-ids MANIFEST` (reuse IDs by path, then by file hash). The manifest records each sheet's sample times, `duplicate_of` for repeated byte streams, and display dimensions after rotation. Use a fresh output folder per run. Durations come from the video stream, since audio can run past the last frame.
 
+Each run also writes `id-registry.json`, retaining IDs for clips absent from the current scan. Keep it beside `manifest.json`: `--keep-ids manifest.json` automatically reads the companion history. You can pass `--keep-ids id-registry.json` directly when moving only the registry. Carry that history forward through subset scans and removals so an old ID is never reused for a new clip. Legacy manifests still work, but cannot recover IDs already lost before the registry existed. The manifest lists only the current scan; inactive registry entries are history, not current footage or regenerated sheets.
+
 ## Observe at two scales
 
 1. **Overview** every unique clip across its full length; long clips need more samples. Label coverage accurately: sampled overview, dense passage, continuous playback, or unavailable.

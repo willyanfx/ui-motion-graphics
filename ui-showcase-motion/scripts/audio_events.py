@@ -5,6 +5,7 @@ Candidates, not classifications: a spike in a frequency band is evidence of a so
 """
 import argparse
 import bisect
+import hashlib
 import io
 import json
 import math
@@ -13,6 +14,8 @@ import shutil
 import subprocess
 from array import array
 from pathlib import Path
+
+from video_metadata import read_id_records
 
 RATE = 16000
 BANDS = {  # approximate 2-pole splits; enough to tell a thump from a click, not a spectral analysis
@@ -198,7 +201,7 @@ def main():
     ids = {}
     if args.ids:
         try:
-            ids = {r['path']: r['id'] for r in json.loads(args.ids.read_text()) if isinstance(r, dict) and 'path' in r and 'id' in r}
+            ids = {r['path']: r['id'] for r in read_id_records(args.ids)}
         except (OSError, ValueError, TypeError) as exc:
             parser.error(f'Could not read --ids manifest: {exc}')
     args.output.mkdir(parents=True, exist_ok=True)
@@ -206,7 +209,11 @@ def main():
     records = []
 
     for path in files:
-        label = ids.get(str(path), path.stem[:40])
+        # Include the resolved path in fallback IDs: equal stems (including truncated
+        # long names) must never share a sheet. Manifest IDs are validated above.
+        stem = re.sub(r'[^A-Za-z0-9_-]+', '-', path.stem)[:40].strip('-') or 'clip'
+        digest = hashlib.sha256(str(path).encode()).hexdigest()
+        label = ids.get(str(path), f'{stem}-{digest}')
         record = {'id': label, 'file': path.name, 'path': str(path)}
         try:
             info = probe(path)
@@ -336,7 +343,9 @@ def main():
             draw.polygon([(lx, ly + 10), (lx + 8, ly + 10), (lx + 4, ly + 2)], fill='#7fe0d0')
             draw.text((lx + 12, ly), 'picture change', fill='#b8c6d8')
             name = f"{label}-audio.png"
-            sheet.save(args.output / name)
+            # Exclusive creation also catches a collision instead of losing evidence.
+            with (args.output / name).open('xb') as output:
+                sheet.save(output, format='PNG')
             record['sheet'] = name
         except (subprocess.CalledProcessError, ValueError, KeyError, OSError) as exc:
             record.update(error=str(exc), review_status='failed')

@@ -5,11 +5,12 @@ import hashlib
 import io
 import json
 import math
-import re
 import shutil
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+
+from video_metadata import display_size, read_id_records
 
 
 def run(args):
@@ -52,28 +53,20 @@ def main():
     previous = []
     if args.keep_ids:
         try:
-            previous = json.loads(args.keep_ids.read_text())
+            previous = read_id_records(args.keep_ids)
+            # Keep manifest.json a current inventory for existing consumers. The
+            # companion registry retains every assigned ID across subset scans.
+            registry_path = args.keep_ids.with_name('id-registry.json')
+            if args.keep_ids.name == 'manifest.json' and registry_path.exists():
+                registry = read_id_records(registry_path)
+                registered = {r['id']: r for r in registry}
+                for record in previous:
+                    known = registered.get(record['id'])
+                    if known is None or known['path'] != record['path']:
+                        raise ValueError('Manifest and companion ID registry disagree.')
+                previous = registry
         except (OSError, ValueError) as exc:
-            parser.error(f'Could not read --keep-ids manifest: {exc}')
-        if not isinstance(previous, list):
-            parser.error('--keep-ids manifest must be a list of video records.')
-        seen_ids, seen_paths = set(), set()
-        for record in previous:
-            if not isinstance(record, dict):
-                parser.error('--keep-ids manifest must contain video record objects.')
-            record_id = record.get('id')
-            if not isinstance(record_id, str) or not re.fullmatch(r'R[0-9]+', record_id):
-                parser.error('--keep-ids records need an ID such as R01.')
-            record_path = record.get('path')
-            if not isinstance(record_path, str) or not record_path:
-                parser.error('--keep-ids records need a nonempty path.')
-            if record_id in seen_ids or record_path in seen_paths:
-                parser.error('--keep-ids records must have unique IDs and paths.')
-            for field in ('file', 'sha256'):
-                if field in record and not isinstance(record[field], str):
-                    parser.error(f'--keep-ids record {field} must be a string.')
-            seen_ids.add(record_id)
-            seen_paths.add(record_path)
+            parser.error(f'Could not read --keep-ids history: {exc}')
     if args.output.exists() and (not args.output.is_dir() or any(args.output.iterdir())):
         parser.error('Choose a new or empty output directory; earlier sheets and manifests will not be mixed or overwritten.')
     args.output.mkdir(parents=True, exist_ok=True)
@@ -114,17 +107,6 @@ def main():
     first_seen = {}                                              # canonical copy = lowest ID among identical bytes
     for path_id, digest in sorted(zip(ids, hashes), key=lambda pair: (len(pair[0]), pair[0])):
         first_seen.setdefault(digest, path_id)
-
-    def display_size(video):
-        width, height = video['width'], video['height']
-        rotation = 0
-        for side in video.get('side_data_list', []):
-            if 'rotation' in side:
-                rotation = side['rotation']
-        rotation = int(float(video.get('tags', {}).get('rotate', rotation) or 0))
-        if rotation % 180:
-            width, height = height, width
-        return width, height, rotation % 360
 
     def inspect(item):
         index, path = item
@@ -174,6 +156,17 @@ def main():
 
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         records = list(pool.map(inspect, enumerate(files)))
+    # Retain absent clips as ID history, without including them in current counts
+    # or pretending their old contact sheets were regenerated.
+    current_ids = set(ids)
+    registry = {r['id']: {k: r[k] for k in ('id', 'file', 'path', 'sha256') if k in r}
+                for r in previous}
+    for record in records:
+        registry[record['id']] = {k: record[k] for k in ('id', 'file', 'path', 'sha256')}
+    for record in registry.values():
+        record['active'] = record['id'] in current_ids
+    history = sorted(registry.values(), key=lambda r: int(r['id'][1:]))
+    (args.output / 'id-registry.json').write_text(json.dumps(history, indent=2) + '\n')
     (args.output / 'manifest.json').write_text(json.dumps(records, indent=2) + '\n')
     failures = [r for r in records if 'error' in r]
     duplicates = {r['id']: r['duplicate_of'] for r in records if 'duplicate_of' in r}

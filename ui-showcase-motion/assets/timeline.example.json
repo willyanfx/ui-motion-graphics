@@ -1,24 +1,77 @@
 {
-  "$comment": "Illustrative contract for a 15 s vertical Reel; scenes S3-S5 omitted. Conventions: frames are the canonical unit (seconds derived; convert with round-half-up, i.e. floor(s*fps + 0.5)). Scene intervals are half-open [start, end), so the last shown frame is end-1. Keyframes are absolute frames inside their scene's [start, end), or inside a layer's [from, until). holdUntil and until are exclusive. Transition overlaps belong to the tail of the outgoing scene; anything that must animate IN during an overlap lives in a layer. Camera poses: x/y are output-pixel translations applied after zoom around 'origin'; 'cut': true jumps to the pose instead of interpolating. Action types: click | tap | hover | type | scroll | drag | system; 'completeAt' is the frame the resulting state is fully settled. Add fields when a project needs them (e.g. measured 'box' geometry); don't rename these. Audio cue 'sync' names what its frame locks to (press | arrival | peak | completeAt | beat | loose); see references/sound-design.md. stagger.from names the origin of a spread: a selector (the action's target), or 'start' | 'end' | 'center'. Replace every 'proposed:' selector with a verified one before building.",
+  "$comment": "Complete planning example for a 15 s vertical Reel; source UI, brand assets, and audio remain proposed. This is not a rendered film. Conventions: frames are the canonical unit (seconds derived; convert with round-half-up, i.e. floor(s*fps + 0.5)). Scene intervals are half-open [start, end), so the last shown frame is end-1. Keyframes are absolute frames inside their scene's [start, end), or inside a layer's [from, until). holdUntil and until are exclusive. Transition overlaps belong to the tail of the outgoing scene; anything that must animate IN during an overlap lives in a layer. Camera poses: x/y are output-pixel translations applied after zoom around 'origin'; 'cut': true jumps to the pose instead of interpolating. Action types: click | tap | hover | type | scroll | drag | system; 'completeAt' is the frame the resulting state is fully settled. Add fields when a project needs them (e.g. measured 'box' geometry); don't rename these. Audio cue 'sync' names what its frame locks to (press | arrival | peak | completeAt | beat | loose); see references/sound-design.md. stagger.from names the origin of a spread: a selector (the action's target), or 'start' | 'end' | 'center'. Replace every 'proposed:' source or selector with a verified one before building. Scene camera poses apply to the stage and scene-space overlays; output-space elements remain fixed. Each subsequent scene starts from the preceding camera pose. Transition owner names a layer ID. Layer zIndex is relative to the output canvas; scene copy defaults to 10. Elements live for their scene interval; interpolate each property between its specified keys and clamp outside them. Later reveals must explicitly start hidden. With no camera pose, use the identity camera.",
   "version": 2,
-  "canvas": { "width": 1080, "height": 1920, "fps": 30, "durationInFrames": 450, "background": "#F6F6F4" },
+  "canvas": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "durationInFrames": 450,
+    "background": "#F6F6F4"
+  },
   "renderer": "remotion",
   "timeUnit": "frames",
-  "stage": { "source": "ProductGrid.tsx", "viewportCss": [414, 896], "scale": 2.3, "offset": [64, 300] },
-  "safeArea": { "top": 270, "bottom": 670, "left": 65, "right": 65, "note": "Provisional Reels ad planning margins; verify current placement before delivery" },
+  "stage": {
+    "source": "proposed:ProductGrid.tsx",
+    "viewportCss": [
+      414,
+      896
+    ],
+    "scale": 2.3,
+    "offset": [
+      64,
+      300
+    ]
+  },
+  "safeArea": {
+    "top": 270,
+    "bottom": 670,
+    "left": 65,
+    "right": 65,
+    "note": "Provisional Reels ad planning margins; verify current placement before delivery"
+  },
   "layers": [
     {
       "id": "app-shell",
       "purpose": "Persistent UI; mounted from the first frame until the end-card handoff finishes; state derived from the action schedule",
-      "target": "ProductGrid",
-      "from": 0, "until": 345
+      "target": "proposed:ProductGrid",
+      "from": 0,
+      "until": 345,
+      "zIndex": 0,
+      "initialState": "filter=all"
+    },
+    {
+      "id": "end-card-background",
+      "purpose": "Expand a neutral mask from the selected filter, then keep the end-card background mounted",
+      "target": "overlay:end-card-background",
+      "from": 333,
+      "until": 450,
+      "space": "output",
+      "zIndex": 20,
+      "shape": "circle",
+      "fill": "#F6F6F4",
+      "anchor": "proposed:[data-motion-id='filter-new']",
+      "anchorFrame": 333,
+      "clip": "canvas",
+      "keyframes": [
+        {
+          "frame": 333,
+          "radius": 0
+        },
+        {
+          "frame": 344,
+          "radius": 2300,
+          "ease": "cubic-bezier(0.65, 0, 0.35, 1)"
+        }
+      ],
+      "$note": "Measure the filter center in output coordinates at frame 333 and freeze it. Radius 2300 covers the 1080x1920 canvas from any on-screen anchor. This is a mask reveal, not a chip morph."
     }
   ],
   "scenes": [
     {
       "id": "S1-hook",
       "purpose": "Pose the question over the full grid",
-      "start": 0, "end": 84,
+      "start": 0,
+      "end": 84,
       "focus": "headline",
       "reference": null,
       "elements": [
@@ -26,12 +79,32 @@
           "id": "headline",
           "target": "copy:'What's new this week?'",
           "space": "output",
-          "style": { "fontSize": 80, "weight": 700, "maxWidth": 900 },
+          "style": {
+            "fontSize": 80,
+            "weight": 700,
+            "maxWidth": 900
+          },
           "keyframes": [
-            { "frame": 0,  "opacity": 0, "y": 24 },
-            { "frame": 15, "opacity": 1, "y": 0, "ease": "cubic-bezier(0.22, 1, 0.36, 1)" },
-            { "frame": 69, "opacity": 1 },
-            { "frame": 83, "opacity": 0, "ease": "cubic-bezier(0.64, 0, 0.78, 0)" }
+            {
+              "frame": 0,
+              "opacity": 0,
+              "y": 24
+            },
+            {
+              "frame": 15,
+              "opacity": 1,
+              "y": 0,
+              "ease": "cubic-bezier(0.22, 1, 0.36, 1)"
+            },
+            {
+              "frame": 69,
+              "opacity": 1
+            },
+            {
+              "frame": 83,
+              "opacity": 0,
+              "ease": "cubic-bezier(0.64, 0, 0.78, 0)"
+            }
           ],
           "$note": "Readable hold 15-69 = 54 frames = 1.8 s (1.5 s headline x 1.2 phone)"
         }
@@ -40,16 +113,56 @@
     {
       "id": "S2-select-filter",
       "purpose": "Show that one tap filters the grid",
-      "start": 84, "end": 189,
+      "start": 84,
+      "end": 189,
       "focus": "filter-new",
-      "reference": { "id": "R04", "window": "1.8-9.1s", "borrow": "One action, visible result, stable camera", "evidence": "obs: overview" },
+      "reference": {
+        "id": "R04",
+        "window": "1.8-9.1s",
+        "borrow": "One action, visible result, stable camera",
+        "evidence": "obs: overview"
+      },
       "camera": [
-        { "frame": 84,  "x": 0,    "y": 0,   "zoom": 1.0, "origin": [540, 960] },
-        { "frame": 108, "x": 0,    "y": 180, "zoom": 1.3, "origin": [540, 960], "ease": "cubic-bezier(0.65, 0, 0.35, 1)" },
-        { "frame": 188, "x": 0,    "y": 180, "zoom": 1.3, "origin": [540, 960] }
+        {
+          "frame": 84,
+          "x": 0,
+          "y": 0,
+          "zoom": 1.0,
+          "origin": [
+            540,
+            960
+          ]
+        },
+        {
+          "frame": 108,
+          "x": 0,
+          "y": 180,
+          "zoom": 1.3,
+          "origin": [
+            540,
+            960
+          ],
+          "ease": "cubic-bezier(0.65, 0, 0.35, 1)"
+        },
+        {
+          "frame": 188,
+          "x": 0,
+          "y": 180,
+          "zoom": 1.3,
+          "origin": [
+            540,
+            960
+          ]
+        }
       ],
       "actions": [
-        { "frame": 130, "target": "[data-motion-id='filter-new']", "type": "tap", "result": "filter=new", "completeAt": 151 }
+        {
+          "frame": 130,
+          "target": "proposed:[data-motion-id='filter-new']",
+          "type": "tap",
+          "result": "filter=new",
+          "completeAt": 151
+        }
       ],
       "elements": [
         {
@@ -57,15 +170,46 @@
           "target": "overlay:touch-indicator",
           "space": "scene",
           "size": 72,
-          "hotspot": [36, 36],
+          "hotspot": [
+            36,
+            36
+          ],
           "path": "arc",
           "keyframes": [
-            { "frame": 108, "anchor": "screen-center", "opacity": 0 },
-            { "frame": 110, "opacity": 1 },
-            { "frame": 124, "anchor": "[data-motion-id='filter-new']", "ease": "cubic-bezier(0.22, 1, 0.36, 1)" },
-            { "frame": 130, "scale": 1 },
-            { "frame": 133, "scale": 0.9 },
-            { "frame": 137, "scale": 1 }
+            {
+              "frame": 108,
+              "anchor": "screen-center",
+              "opacity": 0
+            },
+            {
+              "frame": 110,
+              "opacity": 1
+            },
+            {
+              "frame": 124,
+              "anchor": "proposed:[data-motion-id='filter-new']",
+              "ease": "cubic-bezier(0.22, 1, 0.36, 1)"
+            },
+            {
+              "frame": 130,
+              "scale": 1
+            },
+            {
+              "frame": 133,
+              "scale": 0.9
+            },
+            {
+              "frame": 137,
+              "scale": 1
+            },
+            {
+              "frame": 177,
+              "opacity": 1
+            },
+            {
+              "frame": 188,
+              "opacity": 0
+            }
           ],
           "$note": "Travel 110-124 = 14 frames (about 467 ms; rounded from a 450 ms starting value); hover pause 124-130 = 6 frames; press 3 down / 4 up"
         },
@@ -74,8 +218,26 @@
           "target": "overlay:ripple",
           "space": "scene",
           "keyframes": [
-            { "frame": 130, "scale": 1,   "opacity": 0.5 },
-            { "frame": 141, "scale": 1.5, "opacity": 0, "ease": "cubic-bezier(0.22, 1, 0.36, 1)" }
+            {
+              "frame": 84,
+              "scale": 1,
+              "opacity": 0
+            },
+            {
+              "frame": 129,
+              "opacity": 0
+            },
+            {
+              "frame": 130,
+              "scale": 1,
+              "opacity": 0.5
+            },
+            {
+              "frame": 141,
+              "scale": 1.5,
+              "opacity": 0,
+              "ease": "cubic-bezier(0.22, 1, 0.36, 1)"
+            }
           ]
         },
         {
@@ -83,43 +245,294 @@
           "target": "proposed:[data-motion-id='product-card']",
           "space": "scene",
           "keyframes": [
-            { "frame": 136, "state": "filter=all" },
-            { "frame": 151, "state": "filter=new", "spring": { "stiffness": 170, "damping": 26, "mass": 1 } }
+            {
+              "frame": 136,
+              "state": "filter=all"
+            },
+            {
+              "frame": 151,
+              "state": "filter=new",
+              "spring": {
+                "stiffness": 170,
+                "damping": 26,
+                "mass": 1
+              }
+            }
           ],
-          "stagger": { "children": "card", "frames": 1, "from": "[data-motion-id='filter-new']" },
+          "stagger": {
+            "children": "card",
+            "frames": 1,
+            "from": "proposed:[data-motion-id='filter-new']"
+          },
           "holdUntil": 189,
           "$note": "Result hold 151-189 = 38 frames = 1.27 s (1.0 s x 1.2 phone)"
         }
       ]
     },
     {
+      "id": "S3-read-result",
+      "purpose": "Let the viewer inspect the filtered cards without further UI changes",
+      "start": 189,
+      "end": 243,
+      "focus": "product-cards",
+      "camera": [
+        {
+          "frame": 189,
+          "x": 0,
+          "y": 180,
+          "zoom": 1.3,
+          "origin": [
+            540,
+            960
+          ]
+        },
+        {
+          "frame": 242,
+          "x": 0,
+          "y": 180,
+          "zoom": 1.3,
+          "origin": [
+            540,
+            960
+          ]
+        }
+      ],
+      "elements": [],
+      "holdUntil": 243,
+      "$note": "The app-shell retains filter=new from the action at 130. The pointer is already hidden; no scene entrance or state reset."
+    },
+    {
+      "id": "S4-restore-context",
+      "purpose": "Return to the complete mobile grid while preserving the selected state",
+      "start": 243,
+      "end": 273,
+      "focus": "app-shell",
+      "camera": [
+        {
+          "frame": 243,
+          "x": 0,
+          "y": 180,
+          "zoom": 1.3,
+          "origin": [
+            540,
+            960
+          ]
+        },
+        {
+          "frame": 272,
+          "x": 0,
+          "y": 0,
+          "zoom": 1.0,
+          "origin": [
+            540,
+            960
+          ],
+          "ease": "cubic-bezier(0.65, 0, 0.35, 1)"
+        }
+      ],
+      "elements": []
+    },
+    {
+      "id": "S5-result",
+      "purpose": "Summarize the demonstrated action before revealing the end card",
+      "start": 273,
+      "end": 345,
+      "focus": "benefit",
+      "camera": [
+        {
+          "frame": 273,
+          "x": 0,
+          "y": 0,
+          "zoom": 1.0,
+          "origin": [
+            540,
+            960
+          ]
+        },
+        {
+          "frame": 344,
+          "x": 0,
+          "y": 0,
+          "zoom": 1.0,
+          "origin": [
+            540,
+            960
+          ]
+        }
+      ],
+      "elements": [
+        {
+          "id": "benefit",
+          "target": "copy:'New arrivals, one tap.'",
+          "space": "output",
+          "style": {
+            "fontSize": 72,
+            "weight": 700,
+            "maxWidth": 900
+          },
+          "keyframes": [
+            {
+              "frame": 273,
+              "opacity": 0,
+              "y": 16
+            },
+            {
+              "frame": 279,
+              "opacity": 1,
+              "y": 0
+            },
+            {
+              "frame": 333,
+              "opacity": 1
+            },
+            {
+              "frame": 344,
+              "opacity": 0
+            }
+          ],
+          "$note": "Undistorted reading hold 279-333 = 54 frames = 1.8 s; background reveal starts after that hold."
+        }
+      ]
+    },
+    {
       "id": "S6-end-card",
       "purpose": "Resolve to identity and call to action",
-      "start": 345, "end": 450,
+      "start": 345,
+      "end": 450,
       "focus": "cta",
       "elements": [
-        { "id": "logo", "target": "assets/logo.svg", "space": "output",
-          "keyframes": [ { "frame": 345, "opacity": 0, "scale": 0.94 }, { "frame": 372, "opacity": 1, "scale": 1, "ease": "cubic-bezier(0.22, 1, 0.36, 1)" } ] },
-        { "id": "cta", "target": "copy:'Shop new arrivals'", "space": "output",
-          "keyframes": [ { "frame": 357, "opacity": 0, "y": 16 }, { "frame": 372, "opacity": 1, "y": 0, "ease": "cubic-bezier(0.22, 1, 0.36, 1)" } ] }
+        {
+          "id": "logo",
+          "target": "proposed:assets/logo.svg",
+          "space": "output",
+          "keyframes": [
+            {
+              "frame": 345,
+              "opacity": 0,
+              "scale": 0.94
+            },
+            {
+              "frame": 372,
+              "opacity": 1,
+              "scale": 1,
+              "ease": "cubic-bezier(0.22, 1, 0.36, 1)"
+            }
+          ],
+          "zIndex": 30
+        },
+        {
+          "id": "cta",
+          "target": "copy:'Shop new arrivals'",
+          "space": "output",
+          "keyframes": [
+            {
+              "frame": 357,
+              "opacity": 0,
+              "y": 16
+            },
+            {
+              "frame": 372,
+              "opacity": 1,
+              "y": 0,
+              "ease": "cubic-bezier(0.22, 1, 0.36, 1)"
+            }
+          ],
+          "zIndex": 30
+        }
       ],
       "holdUntil": 450,
       "$note": "End-card hold 372-450 = 78 frames = 2.6 s (2.0 s x 1.2 phone = 2.4 s minimum)"
     }
   ],
   "transitions": [
-    { "from": "S1-hook", "to": "S2-select-filter", "type": "overlay-out", "overlap": [69, 84], "owner": null,
-      "handoff": "Headline fades out over the persistent app-shell; nothing needs to fade in" },
-    { "from": "S5-result", "to": "S6-end-card", "type": "shared-object", "overlap": [333, 345],
-      "owner": "overlay", "handoff": "Selected filter chip hidden in app-shell at 333; overlay copy expands to fill the frame; app-shell ends and end-card background shown at 345" }
+    {
+      "from": "S1-hook",
+      "to": "S2-select-filter",
+      "type": "overlay-out",
+      "overlap": [
+        69,
+        84
+      ],
+      "owner": null,
+      "handoff": "Headline fades out over the persistent app-shell; nothing needs to fade in"
+    },
+    {
+      "from": "S2-select-filter",
+      "to": "S3-read-result",
+      "type": "continuous",
+      "overlap": [
+        189,
+        189
+      ],
+      "owner": null,
+      "handoff": "Keep the same app-shell, selected filter, settled cards, and camera. Pointer has faded out by 188."
+    },
+    {
+      "from": "S3-read-result",
+      "to": "S4-restore-context",
+      "type": "continuous",
+      "overlap": [
+        243,
+        243
+      ],
+      "owner": null,
+      "handoff": "Begin the pullback from the existing close camera pose without resetting the UI."
+    },
+    {
+      "from": "S4-restore-context",
+      "to": "S5-result",
+      "type": "continuous",
+      "overlap": [
+        273,
+        273
+      ],
+      "owner": null,
+      "handoff": "Keep the settled wide camera and filter=new; only the benefit caption enters."
+    },
+    {
+      "from": "S5-result",
+      "to": "S6-end-card",
+      "type": "mask-expansion",
+      "overlap": [
+        333,
+        345
+      ],
+      "owner": "end-card-background",
+      "handoff": "A neutral circular mask expands from the filter center over frames 333-344. At 345 the fully covered app-shell ends; the same background layer stays mounted through frame 449, below the logo and CTA."
+    }
   ],
-  "sound": { "mode": "hybrid", "beatGrid": null, "loudnessTarget": { "lufs": -14, "truePeakDb": -1 } },
+  "sound": {
+    "mode": "hybrid",
+    "beatGrid": null,
+    "loudnessTarget": {
+      "lufs": -14,
+      "truePeakDb": -1
+    }
+  },
   "audio": [
-    { "frame": 130, "cue": "tap", "role": "sfx", "sync": "press", "target": "[data-motion-id='filter-new']", "gainDb": -6, "file": null, "status": "open" },
-    { "frame": 151, "cue": "confirm", "role": "sfx", "sync": "completeAt", "gainDb": -9, "file": null, "status": "open" }
+    {
+      "frame": 130,
+      "cue": "tap",
+      "role": "sfx",
+      "sync": "press",
+      "target": "proposed:[data-motion-id='filter-new']",
+      "gainDb": -6,
+      "file": null,
+      "status": "open"
+    },
+    {
+      "frame": 151,
+      "cue": "confirm",
+      "role": "sfx",
+      "sync": "completeAt",
+      "gainDb": -9,
+      "file": null,
+      "status": "open"
+    }
   ],
   "open": [
-    "Scenes S3-S5 (frames 189-345) omitted from this example",
-    "Product card selector not yet verified in source"
+    "Verify ProductGrid.tsx, the ProductGrid component, and filter/card selectors against the supplied UI; measure the filter anchor after layout.",
+    "Supply the real brand logo and confirm the feature copy.",
+    "Choose licensed tap and confirmation audio or explicitly change to a silent delivery."
   ]
 }

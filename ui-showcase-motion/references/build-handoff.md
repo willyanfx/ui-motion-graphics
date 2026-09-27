@@ -78,6 +78,22 @@ Scale to scope. A full handoff includes:
 
 For planning-only work, use named placeholder roles in `timeline.json` and say that mapping is pending — never present imaginary selectors as executable.
 
+The [filled example plan](../assets/motion-plan.example.md) matches all six scenes in the timeline example. It is structurally complete but deliberately retains proposed source mappings and open audio; it is not a rendered or source-verified project.
+
+## Validate the timeline
+
+Run the Python-only validator before handing off a complete plan:
+
+```sh
+python3 /path/to/ui-showcase-motion/scripts/validate_timeline.py timeline.json
+# After resolving declared placeholders and open decisions:
+python3 /path/to/ui-showcase-motion/scripts/validate_timeline.py timeline.json --require-resolved
+```
+
+Checks include positive canvas settings, contiguous scene coverage, unique IDs, ordered in-range keyframes and camera poses, action/completion bounds, holds, transition references and overlap ownership, and audio cue bounds and action sync. Transition `owner`, when present, names an existing layer ID covering the overlap. A hard cut or continuous boundary uses `[boundary, boundary]`. Keyframes within one track use distinct ascending frames; combine same-frame properties into one object.
+
+Planning mode fails on structural errors and reports declared placeholders, open decisions, and unresolved audio as warnings. `--require-resolved` also fails on those warnings. Neither mode verifies source selectors, asset existence, property conflicts, reading time, or renderer output; keep those checks in intake and visual review. Intentional black frames still need an explicit scene so coverage is unambiguous. Additional renderer-specific fields remain allowed.
+
 ## Verify at each stage
 
 Use [render verification](render-verification.md) for the full procedure.
