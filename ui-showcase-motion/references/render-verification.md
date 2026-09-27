@@ -1,32 +1,31 @@
 # Verify the film and its mechanics
 
-Scale this review to the assignment. A creative plan needs internal consistency; a delivered film needs visual evidence from its export. Avoid treating a small contact sheet or a numerical score as proof that animation feels right.
+Scale review to the assignment: a plan needs internal consistency; a delivered film needs evidence from its export. Contact sheets locate problems; only continuous playback judges rhythm. A numerical score never proves the animation feels right.
 
 ## Review loop
 
-1. Confirm the composition loads with one useful preview, then render a draft covering the intended sequence. Review the whole film for story, continuity, readable holds, clipping, and missing assets. Contact sheets help locate problems; continuous playback is needed to judge rhythm. Label either unavailable check honestly.
-2. Inspect affected passages at higher sample density. For interaction details use full-resolution crops and adjacent frames, not only thumbnails. Batch related fixes by cause: geometry, state, camera, timing, or assets.
-3. Render the changed passage to verify the fix, then check its boundaries in the complete export. Recheck unrelated areas only when the change affects them. Test direct late-frame and backward seeking in the renderer as well.
-4. Report blocking defects separately from optional polish. Automated or AI review findings are candidates; confirm them against actual frames. Do not override a chosen creative direction solely to satisfy a generic score.
+1. Confirm the composition loads, then render a draft of the full sequence. Review the whole film for story, continuity, reading holds, clipping, and missing assets. If you can't play video, say which checks were sampled only.
+2. Inspect problem passages more densely — full-resolution crops and adjacent frames for interaction details. Group fixes by cause: geometry, state, camera, timing, or assets.
+3. Re-render the changed passage, then check its boundaries in the full export. Test late-frame and backward seeking in the renderer.
+4. Report blocking defects separately from polish. Treat automated or AI review findings as candidates until confirmed on real frames. Don't override the chosen creative direction to satisfy a generic score.
 
 ## Action and continuity checks
 
-- At each press, the target exists in the outgoing state, the pointer hotspot overlaps its intended hit area, and the reaction occurs at the planned time. Account for deliberately delayed results or loading states.
-- Persistent UI does not flash, remount, or replay its entrance during one uninterrupted interaction. State changes have a visible user/system cause. Narration and UI agree about the object being acted on.
-- For an object carried across scenes, inspect one frame before, at, and after each ownership transfer. There is one visible copy, and its geometry, color, and layer order remain continuous.
-- At fast camera moves inspect frame edges, text legibility after settling, and blur removal. Intended hard cuts must not become accidental interpolated moves.
-- Inspect the final displayed frame and planned end hold; verify the exported duration, dimensions, FPS, assets, and intended audio separately.
+- At each press: the target exists in the outgoing state, the pointer hotspot overlaps its hit area, and the reaction lands on the planned frame (allowing for deliberate loading states).
+- During one uninterrupted interaction, persistent UI doesn't flash, remount, or replay its entrance. Every state change has a visible cause. Narration and UI agree on what's being acted on.
+- For an object carried across scenes, check one frame before, at, and after each ownership transfer: exactly one visible copy, with continuous geometry, color, and layering.
+- On fast camera moves: frame edges, text legibility after settling, blur fully removed. Intended hard cuts must not become interpolated moves.
+- The final frame and end hold look intended; exported duration, dimensions, FPS, assets, and audio are verified separately.
 
 ## Optional reference comparison
 
-Use [compare_videos.py](../scripts/compare_videos.py) when comparing a measured passage or locating changes between two exports. It needs Python, Pillow, FFmpeg, and FFprobe. It reads the inputs and writes to a new, empty output directory; it does not alter the videos or run a renderer.
+[`compare_videos.py`](../scripts/compare_videos.py) samples a reference and a render side by side. It reads the inputs and writes into a new or empty output folder only.
 
 ```sh
-python3 /path/to/ui-showcase-motion/scripts/compare_videos.py reference.mp4 rendered.mp4 /path/to/review --fps 8 --duration 4 --reference-start 3 --render-start 5
+python3 /path/to/ui-showcase-motion/scripts/compare_videos.py reference.mp4 rendered.mp4 /path/to/review \
+  --fps 8 --duration 4 --reference-start 3 --render-start 5
 ```
 
-The result includes paginated reference/render pairs, `report.json`, a mean grayscale pixel difference at the sampled times, the largest sampled inter-frame changes in the render, and metadata/available-duration differences. Aspect ratios are preserved by padding. Declared start offsets align the selected passage; there is no duration rescaling. Sampling labels are requested seek times, not decoded frame timestamps. For fast mechanics, select a short passage at source FPS and inspect full-resolution frames separately.
+Output: paginated reference/render pairs, `report.json` with mean grayscale difference per sample, the largest inter-frame changes in the render (cut/glitch candidates), and duration/dimension differences. Aspect ratios are padded, start offsets align the passage, and nothing is time-stretched. Timestamps are requested seek times; for fast mechanics sample a short passage at source FPS and inspect full-resolution frames separately.
 
-The score covers only the common sampled interval and can miss unmatched tails, color differences, fine text, easing between samples, and brief glitches. Duration mismatch is reported separately. Large inter-frame changes can be intentional cuts, flashes, or motion; they are inspection candidates, not automatic failures. There is no universal pass threshold.
-
-For an adaptation with different copy, assets, layout, or pacing, prioritize the chosen story and corresponding visual beats. Do not revert a sound creative choice simply because it differs more from the reference. Low pixel difference cannot certify good animation, correct interaction, or an accessible live UI.
+Reading the score: it covers only the common sampled window and misses color shifts, fine text, motion between samples, and brief glitches. There's no pass threshold. Large changes may be intended cuts. For an adaptation with different copy, layout, or pacing, compare corresponding beats and don't revert a sound creative choice just because it differs more from the reference.

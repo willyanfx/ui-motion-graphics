@@ -5,6 +5,7 @@ import hashlib
 import io
 import json
 import math
+import re
 import shutil
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
@@ -26,6 +27,8 @@ def main():
     parser.add_argument('--start', type=float, default=0)
     parser.add_argument('--end', type=float)
     parser.add_argument('--workers', type=int, default=2)
+    parser.add_argument('--keep-ids', type=Path, metavar='MANIFEST',
+                        help='Earlier manifest.json; reuse its IDs by path, then by file hash. New files get the next free IDs.')
     args = parser.parse_args()
     if args.samples < 2 or args.workers < 1 or args.per_sheet < 1 or not math.isfinite(args.start) or args.start < 0:
         parser.error('Use at least two overview samples, positive workers/page size, and a finite nonnegative start.')
@@ -46,21 +49,93 @@ def main():
     files = [source] if source.is_file() else sorted(p for p in source.rglob('*') if p.suffix.lower() in {'.mp4', '.mov', '.webm', '.m4v'})
     if not files:
         parser.error('No supported videos found.')
+    previous = []
+    if args.keep_ids:
+        try:
+            previous = json.loads(args.keep_ids.read_text())
+        except (OSError, ValueError) as exc:
+            parser.error(f'Could not read --keep-ids manifest: {exc}')
+        if not isinstance(previous, list):
+            parser.error('--keep-ids manifest must be a list of video records.')
+        seen_ids, seen_paths = set(), set()
+        for record in previous:
+            if not isinstance(record, dict):
+                parser.error('--keep-ids manifest must contain video record objects.')
+            record_id = record.get('id')
+            if not isinstance(record_id, str) or not re.fullmatch(r'R[0-9]+', record_id):
+                parser.error('--keep-ids records need an ID such as R01.')
+            record_path = record.get('path')
+            if not isinstance(record_path, str) or not record_path:
+                parser.error('--keep-ids records need a nonempty path.')
+            if record_id in seen_ids or record_path in seen_paths:
+                parser.error('--keep-ids records must have unique IDs and paths.')
+            for field in ('file', 'sha256'):
+                if field in record and not isinstance(record[field], str):
+                    parser.error(f'--keep-ids record {field} must be a string.')
+            seen_ids.add(record_id)
+            seen_paths.add(record_path)
     args.output.mkdir(parents=True, exist_ok=True)
+
+    def sha256(path):
+        digest = hashlib.sha256()
+        with path.open('rb') as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+                digest.update(chunk)
+        return digest.hexdigest()
+
+    with ThreadPoolExecutor(max_workers=args.workers) as pool:
+        hashes = list(pool.map(sha256, files))
+
+    # Stable IDs: reuse earlier IDs by resolved path, then by file hash; number new files after the highest known ID.
+    by_path = {r.get('path'): r['id'] for r in previous if r.get('id')}
+    by_hash = {}
+    for r in previous:
+        if r.get('id') and r.get('sha256'):
+            by_hash.setdefault(r['sha256'], []).append((r.get('file'), r['id']))
+    used = {r['id'] for r in previous if r.get('id')}
+    next_number = max([int(i[1:]) for i in used if i[1:].isdigit()] or [0]) + 1
+    ids = [by_path.get(str(path)) for path in files]          # pass 1: same file, same ID
+    taken = {i for i in ids if i}
+    for exact_name in (True, False):                             # pass 2: moved file, same bytes (same name first)
+        for n, (path, digest) in enumerate(zip(files, hashes)):
+            if ids[n] is not None:
+                continue
+            for name, known in by_hash.get(digest, []):
+                if known not in taken and (name == path.name or not exact_name):
+                    ids[n] = known
+                    taken.add(known)
+                    break
+    for n in range(len(ids)):                                    # pass 3: genuinely new files
+        if ids[n] is None:
+            ids[n] = f'R{next_number:02}'
+            next_number += 1
+    first_seen = {}                                              # canonical copy = lowest ID among identical bytes
+    for path_id, digest in sorted(zip(ids, hashes), key=lambda pair: (len(pair[0]), pair[0])):
+        first_seen.setdefault(digest, path_id)
+
+    def display_size(video):
+        width, height = video['width'], video['height']
+        rotation = 0
+        for side in video.get('side_data_list', []):
+            if 'rotation' in side:
+                rotation = side['rotation']
+        rotation = int(float(video.get('tags', {}).get('rotate', rotation) or 0))
+        if rotation % 180:
+            width, height = height, width
+        return width, height, rotation % 360
 
     def inspect(item):
         index, path = item
-        record = {'id': f'R{index:02}', 'file': path.name, 'path': str(path)}
+        digest = hashes[index]
+        record = {'id': ids[index], 'file': path.name, 'path': str(path), 'sha256': digest}
+        if first_seen[digest] != ids[index]:
+            record['duplicate_of'] = first_seen[digest]
         try:
-            digest = hashlib.sha256()
-            with path.open('rb') as stream:
-                for chunk in iter(lambda: stream.read(1024 * 1024), b''):
-                    digest.update(chunk)
-            record['sha256'] = digest.hexdigest()
             meta = json.loads(run(['ffprobe', '-v', 'error', '-show_format', '-show_streams', '-of', 'json', str(path)]))
             video = next(s for s in meta['streams'] if s['codec_type'] == 'video')
             duration = float(video.get('duration') or meta['format']['duration'])
-            record.update(duration=duration, width=video['width'], height=video['height'], fps=video.get('avg_frame_rate'), audio=any(s['codec_type'] == 'audio' for s in meta['streams']))
+            width, height, rotation = display_size(video)
+            record.update(duration=duration, width=width, height=height, rotation=rotation, fps=video.get('avg_frame_rate'), audio=any(s['codec_type'] == 'audio' for s in meta['streams']))
             end = min(args.end if args.end is not None else duration, duration - min(.1, duration / 2))
             if args.start >= end:
                 raise ValueError('Requested sampling interval is outside the video.')
@@ -77,7 +152,8 @@ def main():
                 sheet = Image.new('RGB', (cols * cell_w, 42 + math.ceil(len(page_times) / cols) * cell_h), '#141820')
                 draw = ImageDraw.Draw(sheet)
                 draw.text((10, 8), f"{record['id']} | page {page} | {path.name[:100]}", fill='white')
-                draw.text((10, 24), f"{duration:.2f}s | {video['width']}x{video['height']} | requested seek times; not continuous playback", fill='#b8c6d8')
+                dup = f" | duplicate of {record['duplicate_of']}" if 'duplicate_of' in record else ''
+                draw.text((10, 24), f"{duration:.2f}s | {width}x{height}{dup} | requested seek times; not continuous playback", fill='#b8c6d8')
                 for n, time in enumerate(page_times):
                     raw = run(['ffmpeg', '-v', 'error', '-ss', str(time), '-i', str(path), '-frames:v', '1', '-vf', 'scale=320:180:force_original_aspect_ratio=decrease', '-f', 'image2pipe', '-vcodec', 'png', '-threads', '1', '-'])
                     frame = Image.open(io.BytesIO(raw)).convert('RGB')
@@ -95,10 +171,11 @@ def main():
         return record
 
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        records = list(pool.map(inspect, enumerate(files, 1)))
+        records = list(pool.map(inspect, enumerate(files)))
     (args.output / 'manifest.json').write_text(json.dumps(records, indent=2) + '\n')
     failures = [r for r in records if 'error' in r]
-    print(json.dumps({'videos': len(records), 'failed': failures, 'manifest': str((args.output / 'manifest.json').resolve())}, indent=2))
+    duplicates = {r['id']: r['duplicate_of'] for r in records if 'duplicate_of' in r}
+    print(json.dumps({'videos': len(records), 'unique': len(set(hashes)), 'duplicates': duplicates, 'failed': failures, 'manifest': str((args.output / 'manifest.json').resolve())}, indent=2))
     if failures:
         raise SystemExit(1)
 

@@ -2,78 +2,77 @@
 
 ## Collect the component and assets
 
-Check the conversation and project files first. Then explicitly invite the user to provide the missing materials using normal chat, attachments, or a local folder path. Do not demand a whole repository when one component is sufficient, and do not request uploads through a text-only question tool.
+Check the conversation and project files first, then invite only what's missing — via chat, attachments, or a folder path. One component is usually enough; don't ask for the whole repository. Don't ask for uploads through a text-only question tool.
 
-| Material | What to request when missing | What it enables |
+| Material | Ask for when missing | What it enables |
 |---|---|---|
-| Component source | HTML or React/component files and the relevant entry point | Map the storyboard to real elements |
-| Styling | Component CSS, shared styles/design tokens, and required font files or font references | Preserve the UI's actual appearance |
-| Behavior | JavaScript, existing animation code, relevant dependencies, and how to preview it | Reuse behavior and identify animation conflicts |
-| Visual assets | Logo, preferably SVG for shape work; icons, images, illustrations, textures, video, or device mockups used in the scenes | Plan feasible reveals, transitions, and compositions |
-| Audio, when wanted | Music, voiceover, sound effects, or a stated preference to choose later | Define audio cues without inventing synchronization |
-| Demonstration states | Initial state, action, resulting state, and suitable sample data | Show meaningful cause and effect |
-| Creative boundaries | Which elements to feature, required copy/CTA, and what must remain unchanged | Keep the showcase aligned with the user's intent |
+| Component source | HTML or React files and the entry point | Map the storyboard to real elements |
+| Styling | Component CSS, shared styles/tokens, font files or references | Keep the UI's real appearance |
+| Behavior | JS, existing animation code, dependencies, how to preview | Reuse behavior, spot animation conflicts |
+| Visual assets | Logo (SVG preferred for shape work), icons, images, video, device mockups | Plan feasible reveals and transitions |
+| Audio, if wanted | Music, VO, SFX, or "choose later" | Define cues without inventing sync |
+| Demo states | Initial state, action, resulting state, sample data | Show real cause and effect |
+| Boundaries | What to feature, required copy/CTA, what must not change | Stay aligned with intent |
 
-Start with one concise invitation, adapted to the known context: “Share the component's HTML, CSS, and JavaScript—or point me to its folder—plus the assets it uses. Which element or interaction should be the main focus?” React source is an equally valid input. Follow up only for missing essentials.
+Start with one short invitation adapted to context: "Share the component's HTML, CSS, and JavaScript — or point me to its folder — plus the assets it uses. Which element or interaction should be the focus?" React is equally fine. Follow up only for missing essentials.
 
-Record each material as supplied, found in project, missing, or proposed replacement. Check that referenced paths resolve and identify external dependencies before promising a self-contained render. Do not silently replace a missing brand asset or rebuild supplied UI from an approximation. Offer a labeled placeholder when it helps planning; request the real asset before work that depends on it.
+Mark each material as supplied, found in project, missing, or placeholder. Check that referenced paths resolve and flag external dependencies before promising a self-contained render. Never silently replace a missing brand asset or rebuild supplied UI from an approximation; offer a labeled placeholder for planning and request the real asset before work that depends on it. If the user is unavailable, build with the labeled placeholder and list the asset as [open].
 
 ## Inspect the supplied UI
 
-Read entry HTML, relevant CSS and JS, component files, package manifest, asset paths, and font loading. Identify real selectors/components, bounding boxes, responsive layout, clipping, stacking contexts, existing transforms, and states worth demonstrating. Use an available browser tool to inspect rendering; distinguish source inspection from visual verification.
+Read the entry HTML, relevant CSS/JS, component files, package manifest, asset paths, and font loading. Identify real selectors/components, bounds, responsive layout, clipping, stacking contexts, existing transforms, and states worth showing. Use a browser tool to see it rendered when available — source reading and visual checking are different evidence.
 
-Create a compact element map: file/location → selector/component → narrative role → existing behavior → planned animation → reuse/adaptation needed. A screenshot provides geometry, not editable DOM. Missing HTML does not block ideation, but every unverified selector must stay labeled as proposed.
+Build the element map (section 5 of the [plan template](../assets/motion-plan-template.md)): file → selector/component → role in the film → existing behavior → planned animation. A screenshot gives geometry, not editable DOM; keep any unverified selector marked `proposed:`.
 
-Capture a baseline before adapting. Preserve source UI and create a separate composition when the showcase requires fake cursors, camera wrappers, staged data, or frame-driven interactions. Avoid executing live purchases, messages, or destructive application actions to stage a demo. Use deterministic fixtures for a render; label fictional data and avoid inventing factual product claims.
+Capture a baseline before adapting. Leave the source UI intact and build a separate composition for fake pointers, camera wrappers, staged data, or frame-driven interactions. Never trigger live purchases, messages, or destructive actions to stage a demo. Use deterministic fixtures, label fictional data, and don't invent product claims.
 
 ## Choose the continuity model
 
-Before implementation, choose the appropriate continuity model. Read the following guidance for a walkthrough; a montage or independent feature shot may deliberately use separate scenes.
+A montage or set of independent feature shots can use separate scenes. For a walkthrough, keep a continuous product session:
 
-### Keep a continuous product session
-
-For an uninterrupted interaction, preserve the app shell and persistent components across beats. Change the relevant panel or state instead of remounting the whole UI and replaying its entrances. Visiting an already shown view should restore the appropriate settled state. A click, submission, or clearly signaled system event should explain each meaningful change; narration describes that sequence rather than arbitrarily replacing screens.
-
-Define one action schedule: action time → existing target → resulting state → optional completion time. Derive visible state from the absolute timeline, including prior actions, so a direct seek to a late frame produces the same result as continuous playback. Do not depend on actually replaying pointer clicks, timers, or network requests to reach the state. Plan voiceover after the action path, then adjust holds to fit its meaning.
-
-Keep authentic UI components reusable and place showcase camera, pointer, and orchestration logic outside them where practical. Apply the [anchor and handoff rules](motion-choreography.md#anchor-the-pointer-to-the-component) to both renderers. Verify that layout changes cannot silently move a control away from its pointer.
+- Keep the app shell and persistent components mounted across beats; change the relevant panel or state instead of remounting and replaying entrances. Returning to a view restores its settled state.
+- Every meaningful change has a visible cause — a click, a submission, or a signaled system event. Narration describes that sequence.
+- Define one action schedule (frame → existing target → resulting state → optional completion frame). Derive visible state from the absolute frame, including all prior actions, so seeking straight to a late frame gives the same result as playback. Don't rely on replaying clicks, timers, or network requests.
+- Plan voiceover after the action path, then adjust holds to fit it.
+- In `timeline.json`, declare the persistent UI once in `layers[]` rather than per scene.
+- Keep real UI components reusable; put camera, pointer, and orchestration logic outside them. Apply the [anchor and handoff rules](motion-choreography.md#anchor-the-pointer-to-the-component), and make sure a layout change can't slide a control away from its pointer.
 
 ## Renderer choice
 
-Use their preference if given. If undecided, an existing React component set favors Remotion reuse; existing HTML/CSS/GSAP favors Hyperframes reuse. These are adaptation considerations, not claims that one tool is universally better. Do not migrate the project or install both by default.
+Use the user's preference. If undecided: existing React components favor Remotion; existing HTML/CSS/GSAP favors Hyperframes. Don't migrate the project or install both.
 
-Inspect installed versions and follow the chosen renderer's available skill and current official documentation before writing tool-specific implementation. This skill defines the creative contract; renderer-specific code still needs preview/render validation.
+Check installed versions and follow the chosen renderer's skill and current official docs before writing tool-specific code.
 
 ### Remotion adapter
 
-Represent the film as a composition with width, height, FPS, and duration in frames. Map scene boundaries to sequences and compute visual state from the current frame. Be explicit about local versus global frame numbers. Use frame-driven interpolation or springs; ordinary elapsed browser timers and autonomous CSS animation are not the source of truth for rendering. Convert reusable HTML to React only as needed, preserving CSS and assets where compatible.
+The film is a composition with width, height, FPS, and `durationInFrames`. Map scenes to `<Sequence>`s and compute visual state from `useCurrentFrame()`; be explicit about local vs global frames. Use `interpolate()` / `spring()` — browser timers and autonomous CSS animations are not the source of truth for rendering. Convert HTML to React only as needed, keeping CSS and assets where compatible.
 
-Source: [Remotion fundamentals](https://www.remotion.dev/docs/the-fundamentals), checked 2026-09-27. Consult the installed version's sequencing/animation documentation for API details.
+Source: [Remotion fundamentals](https://www.remotion.dev/docs/the-fundamentals), checked 2026-09-27.
 
 ### Hyperframes adapter
 
-Keep HTML/CSS structure where possible. The documented GSAP contract uses a paused timeline registered in `window.__timelines` under the matching `data-composition-id`. Define a finite composition duration and explicit tween positions. Use explicit endpoint states for reliable seeking, and let Hyperframes own the playhead and media playback. Nested compositions register their own timelines. Recheck the current contract before implementation.
+Keep the HTML/CSS structure. The documented GSAP contract is a paused timeline registered in `window.__timelines` under the matching `data-composition-id`, with a finite duration and explicit tween positions. Use explicit end states so seeking is reliable, and let Hyperframes own the playhead and media playback. Nested compositions register their own timelines.
 
-Source: [Hyperframes GSAP guide](https://hyperframes.heygen.com/guides/gsap-animation), checked 2026-09-27. Use its authoring skill if installed; otherwise consult official docs and the local CLI help.
+Source: [Hyperframes GSAP guide](https://hyperframes.heygen.com/guides/gsap-animation), checked 2026-09-27. Recheck before implementing.
 
 ## Deliverables
 
-Scale to scope. A small motion concept needs a concise plan; a full film handoff normally includes:
+Scale to scope. A full handoff includes:
 
-1. `motion-plan.md`: brief, chosen treatment, references, scene table, motion recipes, assumptions, and current decision status.
-2. `timeline.json`: canvas/FPS/runtime, stable scene IDs, absolute frame boundaries, element mapping, keyframes/eases, transition overlap ownership, optional audio cue points, and renderer choice. Use one declared time unit; keep seconds only as a derived convenience.
-3. Asset map: existing files, adaptations, missing assets, fonts, footage, logo vectors, and any uncertain provenance relevant to actual reuse.
-4. Build prompt: implement the chosen plan with the supplied UI, preserving the mapped elements; resolve specifically named open details; create deterministic seeking and preview; report render/QA evidence.
+1. **`motion-plan.md`** — from the [template](../assets/motion-plan-template.md): brief, treatment, references, materials, element map, scenes, recipes, transitions, assumptions, verification log.
+2. **`timeline.json`** — follow the shape of [`timeline.example.json`](../assets/timeline.example.json): canvas/FPS/duration in frames, stable scene IDs, absolute frame boundaries, element targets, keyframes/eases/springs, camera poses, action schedule, transition ownership, audio cues, renderer, open items.
+3. **Asset map** — plan section 4: existing files, adaptations, missing assets, fonts, footage, logo vectors, provenance notes.
+4. **Build prompt** — plan section 10: implement the plan with the supplied UI, preserve mapped elements, resolve named open items, build deterministic seeking and preview, report render/QA evidence.
 
-Do not produce a purportedly executable timeline with imaginary selectors. For planning-only work, use explicitly named placeholder roles and say mapping remains pending.
+For planning-only work, use named placeholder roles in `timeline.json` and say that mapping is pending — never present imaginary selectors as executable.
 
-## Verify at the appropriate stage
+## Verify at each stage
 
-Use [render verification](render-verification.md) for whole-film inspection, full-resolution action checks, and optional reference comparisons. This extends the checks below; it does not require numerical similarity for an original creative treatment.
+Use [render verification](render-verification.md) for the full procedure.
 
-- Plan: causal story, complete boundaries, no unintended gaps, transition ownership, final hold, and readable content load.
-- Prototype: first frame, each action, each result, both sides of transitions, last frame, and backward/random seeks. Test a late frame directly without playing earlier frames.
-- Render: verify actual dimensions, FPS, duration, fonts/assets, clipping, missing frames, intended audio, and scene continuity in exported media. Preview the rendered file, not just the web page.
-- Iterate: identify whether the issue is story, staging, duration, curve, camera, sound, or implementation; change the responsible layer while preserving chosen direction.
+- **Plan:** causal story, complete boundaries, no gaps, transition ownership, final hold, readable content load.
+- **Prototype:** first frame, each action and result, both sides of each transition, last frame, backward and random seeks (jump to a late frame directly).
+- **Render:** real dimensions, FPS, duration, fonts/assets, clipping, missing frames, audio, and continuity in the exported file — not just the web preview.
+- **Iterate:** find the responsible layer (story, staging, duration, curve, camera, sound, implementation) and change only that.
 
-Report what was actually checked. If only a plan was requested, finish with a usable handoff and the next creative decision, without presenting it as a rendered video.
+Report what was actually checked. For a plan-only request, finish with a usable handoff and the next creative decision.

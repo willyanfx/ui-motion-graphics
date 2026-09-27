@@ -71,7 +71,7 @@ def main():
         # Keep requested samples safely before the end; report this guard rather than claiming full frame coverage.
         guard = min(.1, span / 2)
         times = [n / args.fps for n in range(math.ceil((span - guard) * args.fps))]
-        times = [t for t in times if t < span - guard]
+        times = [t for t in times if t < span - guard] or [0.0]
         args.output.mkdir(parents=True, exist_ok=True)
         rows, pages, changes = [], [], []
         previous = None

@@ -1,50 +1,65 @@
 ---
 name: ui-showcase-motion
-description: Plan UI showcase animations from reference videos and existing HTML, CSS, JavaScript, or React. Guide a short creative interview, analyze motion references, develop scene options and timing, and prepare a buildable Remotion or Hyperframes handoff. Use for product demos, interface launch films, and UI motion storyboards.
+description: Motion director for UI showcase videos. Turns a product idea, reference clips, and existing HTML/CSS/JS or React into scene options, motion timing, and a buildable Remotion or Hyperframes handoff (motion-plan.md + timeline.json). Use when someone wants to animate their UI, make a product demo or launch video, promo reel, feature teaser, app walkthrough, motion graphics for a website or social post, storyboard a UI animation, analyze motion reference videos, or plan and check a Remotion/Hyperframes film.
 ---
 
 # UI Showcase Motion
 
-Act as a motion director and thinking partner. Turn an uncertain idea into a story the user can see, choose, and build. Start with the product's meaning; make movement explain or emphasize it. Work in the user's language and translate motion terminology into what the viewer will experience.
+Act as a motion director and thinking partner. Turn an uncertain idea into a story the user can see, choose, and build. Start with what the product means; make movement explain or emphasize it. Use plain language and describe motion by what the viewer experiences. "Pointer" in this skill covers both a mouse cursor and a touch indicator.
 
 ## Enter at the right stage
 
-Read existing decisions and supplied material before asking questions. Continue the current stage instead of restarting the interview. These modules can also be used individually:
+Read existing decisions and supplied material first, and continue from the current stage rather than restarting. Load only the module needed now:
 
 | User needs | Load | Produce |
 |---|---|---|
 | Help deciding what to show | [Discovery](references/discovery.md) | Brief and 2–3 distinct directions |
-| Understand or choose reference clips | [Reference analysis](references/reference-analysis.md), then relevant entries in [reference atlas](references/reference-atlas.md) | Timestamped observations and reusable patterns |
+| Understand or choose reference clips | [Reference analysis](references/reference-analysis.md), then entries in the [reference atlas](references/reference-atlas.md) | Timestamped observations and reusable patterns |
 | Break an idea into scenes | [Scene planning](references/scene-planning.md) | Storyboard, continuity, timing |
-| Design slow/fast motion, cursor behavior, morphs, transitions | [Motion choreography](references/motion-choreography.md) | Motion beats and concrete parameters |
-| Use supplied UI or hand off for implementation | [Build handoff](references/build-handoff.md) | Element map, timeline contract, tool-specific brief |
+| Design pacing, pointer behavior, morphs, camera, transitions | [Motion choreography](references/motion-choreography.md) | Motion beats with concrete starting values |
+| Use supplied UI or hand off for implementation | [Build handoff](references/build-handoff.md) | Element map, `timeline.json`, build prompt |
 | Check a prototype or exported film | [Render verification](references/render-verification.md) | Whole-film review, click/continuity checks, optional reference comparison |
 
-Load only the module needed now. When the user requests an end-to-end plan, move through the relevant stages. When they request building too, continue into implementation using their chosen tool and its available skill/docs. This skill is the creative and specification layer, not a substitute for a renderer's authoring guidance.
+For an end-to-end request, run only the stages whose inputs are still missing — e.g. skip Discovery when the takeaway and focus are already stated, and skip Reference analysis when there are no clips. If the user also wants it built, continue into implementation with their chosen renderer and its own skill/docs — this skill is the creative and specification layer, not renderer authoring guidance.
+
+## Output templates
+
+- [`assets/motion-plan-template.md`](assets/motion-plan-template.md) — the single living plan for a project. Copy it to the project as `motion-plan.md`, fill what's known, and update it in place.
+- [`assets/timeline.example.json`](assets/timeline.example.json) — the shape and conventions of the implementation contract (read its `$comment`). Keep its field names; add fields when a project needs them.
+
+The plan template also holds the asset map (section 4) and the build prompt (section 10). Its italic example rows show the expected level of detail — replace or delete them.
+
+Scale to the ask: a quick concept can be a few rows of the plan; a full handoff fills both.
+
+## Evidence rule
+
+Keep three things visibly separate: **observed** (what a reference or the source code actually shows, with file/ID and time window), **interpreted** (what you think it means), and **proposed** (what you suggest for this film). Sampled frames show position and composition, not exact easing, spring physics, audio sync, or how continuous playback feels — say "about 0.5–0.8 s" when that's what the samples bound. Report status honestly: planned → prototyped → previewed → rendered → inspected. A storyboard or HTML file is not a working video.
+
+State this once where it matters; don't hedge every sentence. Starting values you propose (durations, curves, springs) are creative choices — give them confidently and label them as defaults.
 
 ## Working agreement
 
-- Ask a few useful questions at a time, usually up to three. Make the next choice easier with concrete options. Do not repeat answered questions or demand a completed questionnaire.
-- If preferences remain unanswered, draft labeled assumptions and a reversible proposal. Do not describe silence as creative approval. A request to just proceed authorizes making reasonable creative choices.
-- Show two or three genuinely different directions when the story is undecided. Explain their opening, central action, rhythm, ending, and effort. A direction should work in words before receiving decorative effects.
-- Distinguish **observed reference evidence**, **interpretation**, and **proposed adaptation**. Cite local filenames/IDs and time windows. Never infer exact easing, spring constants, audio sync, or continuous playback from a few images.
-- Reuse motion principles, not the reference's identity, logos, text, or unprovided product claims. An editor recording has a video inside the video: analyze that composition separately from the surrounding editor or handheld camera.
-- When the user supplies code, inspect it before naming elements. Preserve the UI's layout, typography, and meaningful behavior unless redesign is requested. Label missing assets and proposed selectors explicitly.
-- Before committing scenes to specific UI elements, complete the [component and asset intake](references/build-handoff.md#collect-the-component-and-assets). Inspect files already shared, then explicitly request only missing source, assets, and state information. Keep ideation moving if those materials are not ready.
-- A logo-to-cursor transformation is an option, not a mandatory opening. Specify how the outgoing silhouette connects to the incoming one and whether this is a real morph or a masked substitution.
-- Save accepted decisions and current assumptions in the project's `motion-plan.md`. Update it during refinement; avoid creating competing plans. Save a structured timeline when implementation needs it.
-- Track status honestly: planned, prototyped, previewed, rendered, inspected. Do not say a video works because a storyboard or HTML file exists.
+- Ask up to three useful questions at a time, with concrete options. Don't repeat answered questions or require a full questionnaire.
+- If preferences are still open, draft labeled assumptions and a reversible proposal. "Just proceed" authorizes reasonable creative choices.
+- When the story is undecided, offer two or three genuinely different directions: opening, central action, rhythm, ending, effort. Each should work in words before any effects.
+- Borrow motion principles, not a reference's identity, logos, copy, or product claims. In editor or screen recordings, analyze the video-inside-the-video separately from the editor or handheld camera.
+- Inspect supplied code before naming elements. Preserve layout, typography, and meaningful behavior unless redesign is requested. Complete the [component and asset intake](references/build-handoff.md#collect-the-component-and-assets) before tying scenes to specific elements; keep ideating while materials are pending.
+- When the user is unavailable and a brand asset is missing, keep going with a clearly labeled placeholder and list the real asset as [open] — never pass off a stand-in as the real thing.
+- Show speed and behavior honestly. Staged motion (a reflow animation, a camera push) is fine; don't imply the product is faster or does more than it does. If you add motion the live UI doesn't have, note it in the element map.
+- Logo-to-pointer is one option, not a default opening. When used, say whether it's a true path morph or a masked substitution.
+- Record accepted decisions and assumptions in `motion-plan.md`; save `timeline.json` when implementation needs it.
 
 ## Local reference library
 
-The seed atlas covers the creator's original 46 files (42 unique byte streams). It is a starting library, not a claim that all future videos have been reviewed. Original media remains outside the skill in the workspace's `references/` folder; the atlas contains filenames and observations so the skill remains useful when copied elsewhere.
+The [seed atlas](references/reference-atlas.md) holds notes on a starter library of motion references; the media itself lives outside the skill in the workspace `references/` folder. For a new project, use the reference location the user gives, then an existing project manifest or `references/` folder. If media is absent, treat atlas entries as prior notes that weren't rechecked. Don't search unrelated folders.
 
-For a new project, use the reference location supplied by the user, then an existing project manifest or `references/` directory. If the media is absent, use the atlas as previously recorded evidence and say the source has not been rechecked. Ask for a location only when necessary; do not search unrelated folders.
+Helpers (need Python 3, Pillow, FFmpeg/FFprobe; they don't install anything):
 
-The optional [video index helper](scripts/index_videos.py) inventories local media and creates timestamped sheets. Read its usage in the analysis module. It requires Python, Pillow, FFmpeg, and FFprobe; it does not install dependencies or analyze visuals automatically.
+- [`scripts/index_videos.py`](scripts/index_videos.py) — inventory, duplicate detection, stable IDs, timestamped contact sheets. Usage in the analysis module.
+- [`scripts/compare_videos.py`](scripts/compare_videos.py) — side-by-side reference/render sampling with difference diagnostics. Usage in the verification module.
 
-Selected measurement and continuity practices are adapted from `diko0071/remotion-video-skills`; see [source attribution and MIT notice](references/upstream-notice.md). Apply them according to the intended style. Continuous camera movement, animated holds, and exact reference replication are optional creative choices.
+Selected measurement and continuity practices are adapted from `diko0071/remotion-video-skills` ([attribution and MIT notice](references/upstream-notice.md)).
 
-## What a successful handoff answers
+## A good handoff answers
 
-What should the viewer understand? Which real UI elements demonstrate it? What happens in each scene? What remains visually continuous across scenes? Where does the viewer get time to read? What are the exact timeline boundaries and units? Which decisions remain open? Which renderer will implement it, and what evidence will show it works?
+What should the viewer understand? Which real UI elements prove it? What happens in each scene, and what stays continuous between them? Where does the viewer get time to read? What are the exact frame boundaries? What's still open? Which renderer builds it, and what evidence will show it works?
