@@ -10,13 +10,13 @@ Requires Node.js and npm. Choose your agent:
 
 ```sh
 # Codex
-npx skills add willyanfx/ui-motion-graphics -a codex
+npx skills add willyanfx/ui-showcase-graphics -a codex
 
 # Claude Code
-npx skills add willyanfx/ui-motion-graphics -a claude-code
+npx skills add willyanfx/ui-showcase-graphics -a claude-code
 
 # Other supported agents: choose interactively
-npx skills add willyanfx/ui-motion-graphics
+npx skills add willyanfx/ui-showcase-graphics
 ```
 
 Run inside your project, or add `-g` to install across projects. See the [Skills CLI documentation](https://github.com/vercel-labs/skills#supported-agents) for supported agents.
