@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI Showcase Motion"
+  short_description: "Turn UI references into scenes and motion plans"
+  default_prompt: "Use $ui-showcase-motion to help me shape my UI showcase idea, choose reference techniques, and plan scenes for Remotion or Hyperframes."
