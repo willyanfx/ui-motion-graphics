@@ -1,5 +1,5 @@
 {
-  "$comment": "Illustrative contract for a 15 s vertical Reel; scenes S3-S5 omitted. Conventions: frames are the canonical unit (seconds derived; convert with round-half-up, i.e. floor(s*fps + 0.5)). Scene intervals are half-open [start, end), so the last shown frame is end-1. Keyframes are absolute frames inside their scene's [start, end), or inside a layer's [from, until). holdUntil and until are exclusive. Transition overlaps belong to the tail of the outgoing scene; anything that must animate IN during an overlap lives in a layer. Camera poses: x/y are output-pixel translations applied after zoom around 'origin'; 'cut': true jumps to the pose instead of interpolating. Action types: click | tap | hover | type | scroll | drag | system; 'completeAt' is the frame the resulting state is fully settled. Add fields when a project needs them (e.g. measured 'box' geometry); don't rename these. Replace every 'proposed:' selector with a verified one before building.",
+  "$comment": "Illustrative contract for a 15 s vertical Reel; scenes S3-S5 omitted. Conventions: frames are the canonical unit (seconds derived; convert with round-half-up, i.e. floor(s*fps + 0.5)). Scene intervals are half-open [start, end), so the last shown frame is end-1. Keyframes are absolute frames inside their scene's [start, end), or inside a layer's [from, until). holdUntil and until are exclusive. Transition overlaps belong to the tail of the outgoing scene; anything that must animate IN during an overlap lives in a layer. Camera poses: x/y are output-pixel translations applied after zoom around 'origin'; 'cut': true jumps to the pose instead of interpolating. Action types: click | tap | hover | type | scroll | drag | system; 'completeAt' is the frame the resulting state is fully settled. Add fields when a project needs them (e.g. measured 'box' geometry); don't rename these. Audio cue 'sync' names what its frame locks to (press | arrival | peak | completeAt | beat | loose); see references/sound-design.md. stagger.from names the origin of a spread: a selector (the action's target), or 'start' | 'end' | 'center'. Replace every 'proposed:' selector with a verified one before building.",
   "version": 2,
   "canvas": { "width": 1080, "height": 1920, "fps": 30, "durationInFrames": 450, "background": "#F6F6F4" },
   "renderer": "remotion",
@@ -86,7 +86,7 @@
             { "frame": 136, "state": "filter=all" },
             { "frame": 151, "state": "filter=new", "spring": { "stiffness": 170, "damping": 26, "mass": 1 } }
           ],
-          "stagger": { "children": "card", "frames": 1 },
+          "stagger": { "children": "card", "frames": 1, "from": "[data-motion-id='filter-new']" },
           "holdUntil": 189,
           "$note": "Result hold 151-189 = 38 frames = 1.27 s (1.0 s x 1.2 phone)"
         }
@@ -113,8 +113,10 @@
     { "from": "S5-result", "to": "S6-end-card", "type": "shared-object", "overlap": [333, 345],
       "owner": "overlay", "handoff": "Selected filter chip hidden in app-shell at 333; overlay copy expands to fill the frame; app-shell ends and end-card background shown at 345" }
   ],
+  "sound": { "mode": "hybrid", "beatGrid": null, "loudnessTarget": { "lufs": -14, "truePeakDb": -1 } },
   "audio": [
-    { "frame": 130, "cue": "tap", "file": null, "status": "open" }
+    { "frame": 130, "cue": "tap", "role": "sfx", "sync": "press", "target": "[data-motion-id='filter-new']", "gainDb": -6, "file": null, "status": "open" },
+    { "frame": 151, "cue": "confirm", "role": "sfx", "sync": "completeAt", "gainDb": -9, "file": null, "status": "open" }
   ],
   "open": [
     "Scenes S3-S5 (frames 189-345) omitted from this example",

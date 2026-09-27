@@ -1,6 +1,6 @@
 # Seed reference atlas
 
-Reviewed 2026-09-27. **46 files, 42 unique videos, approximately 12 minutes 27 seconds of source material including duplicates.** All files decoded and received a 12-frame overview. All overview sheets were visually inspected; five passages received 20 additional samples each. This is sampled visual analysis, not a claim of uninterrupted playback or frame-by-frame review of every clip. Sound was not auditioned. Exact curves, physics, and audio sync remain unverified. Long clips R08 and R32 need denser inspection for their selected transitions.
+Reviewed 2026-09-27. **46 files, 42 unique videos, approximately 12 minutes 27 seconds of source material including duplicates.** All files decoded and received a 12-frame overview. All overview sheets were visually inspected; five passages received 20 additional samples each. This is sampled visual analysis, not a claim of uninterrupted playback or frame-by-frame review of every clip. Sound was not auditioned; a later automated audio pass (loudness, hit candidates, tempo, hit-to-picture sync) is summarized in [sound for UI films](sound-design.md#library-evidence). Exact curves, physics, and audio sync remain unverified. Long clips R08 and R32 need denser inspection for their selected transitions.
 
 The original media lives in the creator workspace `references/` folder alongside the `ui-showcase-motion/` skill folder. The generated workspace `analysis/reference-review.json` maps IDs to paths, hashes, metadata, sample timestamps, and observations. The workspace `reference-library.html` lets the user play the originals and compare notes. Those large media files are intentionally not bundled inside the skill.
 
@@ -11,6 +11,7 @@ The original media lives in the creator workspace `references/` folder alongside
 - **Playful branded opening:** R37 dot/pill interaction + R29 geometric identity construction, followed by a restrained real UI action. A logo-to-cursor morph is a new proposed adaptation, not something verified in these two clips.
 - **Cinematic device showcase:** R22 device motif + R26 detail/context contrast. Requires device assets and deliberate camera design.
 - **Editorial launch:** R18 color chapters + R17 fixed typographic focus + R46 statement/evidence hold. Borrow structures, not third-party copy or statistics.
+- **Type-led social loop:** L05 control-drives-preview + L04 feature pill pile + L10 conveyor into the CTA. L-series entries are web-sampled previews documented in [kinetic type](kinetic-type.md#source-set-l-series), not files in the local library. R10's filename suggests a related Remotion reel announcement; that link is unverified.
 
 ## What the five close reviews support
 

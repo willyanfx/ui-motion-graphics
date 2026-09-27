@@ -23,7 +23,7 @@ Options: `--samples N` or `--fps F`, `--start`, `--end`, `--per-sheet` (default 
 
 1. **Overview** every unique clip across its full length; long clips need more samples. Label coverage accurately: sampled overview, dense passage, continuous playback, or unavailable.
 2. **Detail** for a technique worth adapting: inspect the short passage densely — before state, initiation, peak travel, settle, hold. Frame sequences support spatial analysis; felt rhythm needs playback.
-3. **Sound** only with an audio-capable tool. An audio stream existing is not evidence of beat sync.
+3. **Sound** with [`audio_events.py`](../scripts/audio_events.py) ([how to read it](sound-design.md#analyze-reference-sound)) or by listening. An audio stream existing is not evidence of beat sync; a sync claim needs picture changes landing on hits clearly more often than chance.
 
 Filenames aren't visual evidence. Separate screen-recording camera motion from authored scene motion.
 

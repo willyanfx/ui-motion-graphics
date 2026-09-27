@@ -8,7 +8,7 @@ For a vague request, a good first round:
 2. What's the focus: one interaction, a complete screen, or a journey across screens? Ask for the idea in plain language, not a spec.
 3. Which feeling fits: calm and precise, playful and elastic, or bold and fast? Invite a reference ID and a specific moment they like or dislike.
 
-Then resolve only the next gaps that change the plan: placement/aspect ratio, length, logo/CTA, available HTML or React, sound/voiceover, Remotion vs Hyperframes. Suggest defaults with their consequences — "I suggest a 15-second draft with three feature beats; that leaves time to read the result."
+Then resolve only the next gaps that change the plan: placement/aspect ratio, length, logo/CTA, available HTML or React, story shape, sound mode and voiceover, Remotion vs Hyperframes. Offer [story shapes](scene-planning.md#story-shapes) and [sound modes](sound-design.md#choose-a-sound-mode) as short menus rather than open questions. Suggest defaults with their consequences — "I suggest a 15-second draft with three feature beats; that leaves time to read the result."
 
 Shortcuts: if the user supplies HTML first, inventory it while asking about the story. If they bring a storyboard, skip ideation and refine choreography. If they want a close reference adaptation, ask which visual qualities matter most.
 
@@ -30,12 +30,14 @@ Offer up to three compact treatments, each with:
 - One or two reference moments and exactly what's borrowed.
 - Ending or loop behavior, and the effort difference.
 
-Example treatments for a dashboard:
+A treatment is a [story shape](scene-planning.md#story-shapes) plus a motion approach. Example treatments for a dashboard (the last suits a teaser or social loop):
 
-**Follow the pointer:** logo resolves into a pointer, pointer picks a real filter, chart changes, camera returns to the full dashboard. Best for cause and effect. Needs a deliberate silhouette bridge.
+**Follow the pointer:** logo resolves into a pointer, pointer picks a real filter, chart changes, camera returns to the full dashboard. Best for cause and effect. Needs a deliberate silhouette bridge. Shape: feature proof.
 
-**Build the product:** one card expands into a panel, other panels join, the full UI resolves, then one useful action proves it works. Best for layout and hierarchy. Needs careful shared bounds.
+**Build the product:** one card expands into a panel, other panels join, the full UI resolves, then one useful action proves it works. Best for layout and hierarchy. Needs careful shared bounds. Shape: assembly.
 
-**Editorial feature tour:** bold short statement, close view of one meaningful action, clean cut to the next benefit, composed end card. Best for launches. Needs disciplined copy and reading holds.
+**Editorial feature tour:** bold short statement, close view of one meaningful action, clean cut to the next benefit, composed end card. Best for launches. Needs disciplined copy and reading holds. Shape: numbered list or feature proof.
+
+**Type-led loop:** product name on a fixed poster grid, one real control drives a live preview, feature pills pile up, a conveyor of benefit words lands on the CTA and carries the seam back to the start. Best for Reels and teasers. Needs a variable font and honest feature copy ([kinetic type](kinetic-type.md)). Shape: loop story.
 
 Ask for a choice or combination when the user wants to collaborate; if they already asked you to decide and build, decide. Record choices, rejected approaches, open questions, and assumptions in `motion-plan.md` (start from the [template](../assets/motion-plan-template.md)).

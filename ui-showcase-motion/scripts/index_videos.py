@@ -74,6 +74,8 @@ def main():
                     parser.error(f'--keep-ids record {field} must be a string.')
             seen_ids.add(record_id)
             seen_paths.add(record_path)
+    if args.output.exists() and (not args.output.is_dir() or any(args.output.iterdir())):
+        parser.error('Choose a new or empty output directory; earlier sheets and manifests will not be mixed or overwritten.')
     args.output.mkdir(parents=True, exist_ok=True)
 
     def sha256(path):

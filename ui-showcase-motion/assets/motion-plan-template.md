@@ -2,7 +2,17 @@
 
 Film status: <planned | prototyped | previewed | rendered | inspected>  ·  Last updated: <YYYY-MM-DD>
 
-Keep one plan per project and update it in place. Decision tags used throughout: **[decided]** (user chose or confirmed), **[assumed]** (your reversible default), **[open]** (needs input). Evidence tags: **obs** (seen in source/reference — add coverage: overview, dense, or playback), **int** (your reading of it), **prop** (your proposal).
+Keep one plan per project and update it in place. Film status tracks evidence — how far the whole film has been built and checked; each scene's status (section 6) tracks approval. Decision tags used throughout: **[decided]** (user chose or confirmed), **[assumed]** (your reversible default), **[open]** (needs input). Evidence tags: **obs** (seen in source/reference — add coverage: overview, dense, or playback), **int** (your reading of it), **prop** (your proposal).
+
+## Current point
+
+| Last approved | In test | Next action |
+|---|---|---|
+| *S1 hook (v02)* | *S2 pointer timing (v03)* | *Tighten S2 travel, then render S3* |
+
+**Global rules** — feedback that applies to every scene. Add one when a note recurs or the user says "always" or "never".
+
+- *[decided] No overshoot on text or numbers.*
 
 > Rows in *italics* are examples showing the level of detail. Replace or delete them — never ship them. If the project has no references, write "none" in section 3.
 
@@ -17,7 +27,8 @@ Keep one plan per project and update it in place. Decision tags used throughout:
 | Focus | One interaction / one screen / a journey across screens | |
 | Feel | e.g. calm and precise | |
 | Renderer | Remotion / Hyperframes | |
-| Sound | Music, VO, SFX, or none | |
+| Story shape | Feature proof / problem → relief / before-after / journey / assembly / list / question → answer / loop | |
+| Sound | Mode (music-led / sound-design-led / hybrid / voice-led / silent-first), BPM if music-led, loudness target | |
 | Must stay unchanged | Layout, copy, brand elements the film must not alter | |
 
 ## 2. Chosen treatment
@@ -57,10 +68,18 @@ Mark unverified selectors `proposed:`.
 
 ## 6. Scenes
 
-| ID | Frames `[start, end)` | Seconds | Purpose | Focus | Action → result | Exit / continuity | Reference |
-|---|---|---|---|---|---|---|---|
-| *S1* | *[0, 84)* | *0–2.8* | *Hook* | *Headline* | *Question appears over the full grid* | *Headline fades out over persistent grid, overlap [69, 84)* | *none* |
-| *S2* | *[84, 189)* | *2.8–6.3* | *Show cause* | *"New" filter* | *Camera settles, pointer travels, taps; grid filters* | *Selected state persists* | *R04* |
+| ID | Frames `[start, end)` | Seconds | Purpose | Focus | Action → result | Exit / continuity | Reference | Status |
+|---|---|---|---|---|---|---|---|---|
+| *S1* | *[0, 84)* | *0–2.8* | *Hook* | *Headline* | *Question appears over the full grid* | *Headline fades out over persistent grid, overlap [69, 84)* | *none* | *approved v02* |
+| *S2* | *[84, 189)* | *2.8–6.3* | *Show cause* | *"New" filter* | *Camera settles, pointer travels, taps; grid filters* | *Selected state persists* | *R04* | *in test v03* |
+
+Status: `to direct` → `in test` → `revise` → `approved`; a replaced approach becomes `superseded` (keep the row, note what replaced it).
+
+### Sound map
+
+| Frame | Cue | Role | Sync to | Gain | Source / license | Status |
+|---|---|---|---|---|---|---|
+| *130* | *tap* | *sfx* | *press on "New" filter* | *−6 dB* | *library name, license* | *open* |
 
 ## 7. Motion recipes
 
@@ -95,5 +114,8 @@ Implement this plan in <renderer> using the supplied component at <path>. Preser
 
 ## 11. Verification log
 
-| Date | Stage | What was checked | Result |
-|---|---|---|---|
+| Date | Stage | Version / file | What was checked | Decision |
+|---|---|---|---|---|
+| *2026-09-27* | *previewed* | *renders/S2_v03.mp4* | *Press frame 130, result hold, backward seek* | *revise: travel feels slow; keep camera and hold (locked)* |
+
+Name renders by scene and version, and never overwrite an approved one. A "looks good" becomes a row: which version, what's approved, what's still pending.

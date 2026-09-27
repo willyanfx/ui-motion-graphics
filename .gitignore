@@ -1,0 +1,7 @@
+# Track only the skill; media, analysis, backups, and builds stay local.
+/*
+!/.gitignore
+!/README.md
+!/ui-showcase-motion/
+.DS_Store
+__pycache__/

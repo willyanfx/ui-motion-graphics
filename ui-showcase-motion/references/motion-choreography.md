@@ -4,7 +4,7 @@
 
 Build contrast within and between actions: prepare → travel → settle → hold. A slow opening followed by fast movement is not the same as ease-in-out on everything. Decide when attention changes, then pick curves for that intent.
 
-When something feels wrong, diagnose which layer before changing all durations:
+When timing or a curve feels wrong (see [problem categories](render-verification.md#problem-categories)), find which of these layers is at fault before changing all durations:
 
 - **Scene rhythm** — time spent on each idea.
 - **Velocity profile** — how one object accelerates and settles.
@@ -82,7 +82,7 @@ For 9:16 placements (1080×1920), start with these and check the platform's curr
 - **Fitting a web component:** render the component at a mobile CSS viewport (390–430 px wide), scale it to ~900–1000 px wide on the canvas, and position it so the action and its result stay inside the safe area (the rest of the component may run past it). Record viewport, scale, and offset in the timeline's `stage` block so geometry is reproducible. Don't squeeze a desktop layout into portrait; use its real mobile breakpoint.
 - **Touch indicator instead of a cursor:** a mobile layout reads wrong with a desktop arrow. Use a soft circle ~64–80 px on a 1080-wide canvas (white at ~85% with a subtle shadow, or brand color), a 200 ms pause over the target, a press to ~0.9 scale, and a ripple. Action `type` is `tap`.
 - **Text sizes on 1080×1920:** headlines 64–96 px, supporting lines 40–52 px, never under ~32 px; line width ≤ ~900 px; ≤ 2 lines per beat.
-- **Loop:** Reels autoplay and repeat — decide whether the last frame should cut cleanly back to the first, or hold a composed end card.
+- **Loop:** Reels autoplay and repeat — decide whether the last frame should cut cleanly back to the first, or hold a composed end card. For a seamless loop, put the seam inside a transition, not a hold ([loop rules](kinetic-type.md#loops)).
 
 ## Classical principles for UI
 
@@ -91,8 +91,9 @@ For 9:16 placements (1080×1920), start with these and check the platform's curr
 - **Slow in / slow out:** decide where the object covers most distance and where it visibly settles.
 - **Arcs:** curved paths feel natural for pointers and floating objects; straight paths read better on grids.
 - **Follow-through / overlap:** a panel leads and its contents settle slightly later — but nothing should still be moving during the key reading moment.
-- **Squash and stretch:** fine for dots, badges, playful pointers. Never distort text, charts, or serious controls.
+- **Squash and stretch:** fine for dots, badges, playful pointers. Never distort body text, UI labels, charts, or serious controls. Display words in a type-led beat may squash or stretch as a transition if they're fully restored before their reading hold (see [kinetic type](kinetic-type.md#guardrails)).
 - **Exaggeration:** enlarge a target or camera move enough to read on video without breaking the UI's logic.
+- **Cause as origin:** a change spreads from what caused it — the ripple starts at the pressed control, a stagger radiates from the source card, a reflow moves away from the insertion point. Name the origin and direction in the recipe (`stagger from: pressed chip, outward`); top-left-first by default reads as unrelated to the action.
 - **Secondary action:** a click pulse or highlight supports the main change; drop it if the state change already explains itself.
 - **Pose to pose:** define entry, peak, and resolved states before interpolating. Seed procedural particles so they repeat.
 
@@ -127,6 +128,8 @@ Keep the pointer in the same transformed layer as its target, or project the tar
 
 Represent camera motion as ordered poses: frame, position, zoom, transform origin, and an explicit cut flag (conventions in the [timeline example](../assets/timeline.example.json)). Don't land a press during a camera move — settle the camera first so the viewer can see what's being touched. Give each move a reason — establish context, approach an action, follow a result, restore the full view. A cut switches poses; it must never interpolate through unrelated space. Hold still when reading or precision benefits.
 
+Avoid default camera grammar: a slow push-in on every screen, a 3D tilt or float with no reason, drift that continues through a reading hold, a zoom that exists only to fill time. Prefer moves that do a job: start close on the detail and earn the wide view, reveal the layout past a foreground element, follow the result as it moves, or hold still. Describe the move by its cause — "the camera follows the card as it expands into the panel" — not just "zoom in".
+
 Directional blur for fast travel: scale it with displacement per frame in rendered coordinates, normalize for FPS, cap it (start near 12 px at 1080p), and remove it during holds and across hard cuts. Use overscan so frame edges don't show transparent strips.
 
 When an object bridges scenes, define the source anchor, carry interval, destination anchor, and the exact ownership transfer. A temporary overlay can hold the object in output coordinates while scenes change underneath: hide the source when the overlay takes over, reveal the destination when it finishes. Match position, scale, shape, color, and stacking at both ends, and check the frames immediately before and after each transfer for duplicates or a missing frame. Remotion sequences and Hyperframes compositions both follow this contract.
@@ -137,6 +140,8 @@ When an object bridges scenes, define the source anchor, carry interval, destina
 - **Directional wipe** — the layout implies travel.
 - **Mask expansion** — entering a detail.
 - **Hard cut** — a clean change of topic.
+- **Occlusion cut** — a foreground element (card, panel, device, band of color) crosses the frame; the scene changes while it covers the view. Cut on the fully covered frame; the occluder's direction and speed stay continuous across the cut.
+- **Match cut on motion** — no shared object, but position, direction, and speed carry over: the pointer leaves one screen moving right and enters the next at the same spot, or a round button's shape becomes the next scene's avatar. Match the frame where the motion is fastest, so the eye follows movement rather than detail.
 
 Blur can soften travel but resolves before reading. A crossfade implies two simultaneous states — check it doesn't confuse the interface story.
 

@@ -10,7 +10,7 @@ Check the conversation and project files first, then invite only what's missing 
 | Styling | Component CSS, shared styles/tokens, font files or references | Keep the UI's real appearance |
 | Behavior | JS, existing animation code, dependencies, how to preview | Reuse behavior, spot animation conflicts |
 | Visual assets | Logo (SVG preferred for shape work), icons, images, video, device mockups | Plan feasible reveals and transitions |
-| Audio, if wanted | Music, VO, SFX, or "choose later" | Define cues without inventing sync |
+| Audio, if wanted | Music, VO, SFX, or "choose later"; licenses | Define cues without inventing sync ([sound module](sound-design.md)) |
 | Demo states | Initial state, action, resulting state, sample data | Show real cause and effect |
 | Boundaries | What to feature, required copy/CTA, what must not change | Stay aligned with intent |
 
@@ -37,6 +37,18 @@ A montage or set of independent feature shots can use separate scenes. For a wal
 - In `timeline.json`, declare the persistent UI once in `layers[]` rather than per scene.
 - Keep real UI components reusable; put camera, pointer, and orchestration logic outside them. Apply the [anchor and handoff rules](motion-choreography.md#anchor-the-pointer-to-the-component), and make sure a layout change can't slide a control away from its pointer.
 
+## Parallel builds
+
+Split implementation across tasks or agents only where no two of them change the same state. Good splits: independent scenes, the end card, audio, reference research. Bad splits: two tasks tuning the same scene, one editing shared tokens or `timeline.json` while another builds from the old version.
+
+Record ownership in the plan before starting:
+
+| Task | Scenes | May edit | Must not edit | Last sync |
+|---|---|---|---|---|
+| *A* | *S1–S2* | *scenes/S1, scenes/S2* | *layers/, timeline.json* | *2026-09-27* |
+
+One owner holds persistent layers, shared styles, and `timeline.json`. Each task reads the plan before starting, records its boundary frames when it finishes, and reports if it moves a boundary. Saved build prompts and old files are history; the plan decides.
+
 ## Renderer choice
 
 Use the user's preference. If undecided: existing React components favor Remotion; existing HTML/CSS/GSAP favors Hyperframes. Don't migrate the project or install both.
@@ -59,7 +71,7 @@ Source: [Hyperframes GSAP guide](https://hyperframes.heygen.com/guides/gsap-anim
 
 Scale to scope. A full handoff includes:
 
-1. **`motion-plan.md`** — from the [template](../assets/motion-plan-template.md): brief, treatment, references, materials, element map, scenes, recipes, transitions, assumptions, verification log.
+1. **`motion-plan.md`** — from the [template](../assets/motion-plan-template.md): current point and global rules, brief, treatment, references, materials, element map, scenes, recipes, transitions, assumptions, verification log.
 2. **`timeline.json`** — follow the shape of [`timeline.example.json`](../assets/timeline.example.json): canvas/FPS/duration in frames, stable scene IDs, absolute frame boundaries, element targets, keyframes/eases/springs, camera poses, action schedule, transition ownership, audio cues, renderer, open items.
 3. **Asset map** — plan section 4: existing files, adaptations, missing assets, fonts, footage, logo vectors, provenance notes.
 4. **Build prompt** — plan section 10: implement the plan with the supplied UI, preserve mapped elements, resolve named open items, build deterministic seeking and preview, report render/QA evidence.
@@ -73,6 +85,6 @@ Use [render verification](render-verification.md) for the full procedure.
 - **Plan:** causal story, complete boundaries, no gaps, transition ownership, final hold, readable content load.
 - **Prototype:** first frame, each action and result, both sides of each transition, last frame, backward and random seeks (jump to a late frame directly).
 - **Render:** real dimensions, FPS, duration, fonts/assets, clipping, missing frames, audio, and continuity in the exported file — not just the web preview.
-- **Iterate:** find the responsible layer (story, staging, duration, curve, camera, sound, implementation) and change only that.
+- **Iterate:** name the main problem with the [problem categories](render-verification.md#problem-categories) and change only that layer.
 
 Report what was actually checked. For a plan-only request, finish with a usable handoff and the next creative decision.
