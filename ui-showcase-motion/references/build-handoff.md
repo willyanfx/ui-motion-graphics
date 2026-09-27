@@ -26,7 +26,19 @@ Create a compact element map: file/location → selector/component → narrative
 
 Capture a baseline before adapting. Preserve source UI and create a separate composition when the showcase requires fake cursors, camera wrappers, staged data, or frame-driven interactions. Avoid executing live purchases, messages, or destructive application actions to stage a demo. Use deterministic fixtures for a render; label fictional data and avoid inventing factual product claims.
 
-## Pick a renderer with the user's context
+## Choose the continuity model
+
+Before implementation, choose the appropriate continuity model. Read the following guidance for a walkthrough; a montage or independent feature shot may deliberately use separate scenes.
+
+### Keep a continuous product session
+
+For an uninterrupted interaction, preserve the app shell and persistent components across beats. Change the relevant panel or state instead of remounting the whole UI and replaying its entrances. Visiting an already shown view should restore the appropriate settled state. A click, submission, or clearly signaled system event should explain each meaningful change; narration describes that sequence rather than arbitrarily replacing screens.
+
+Define one action schedule: action time → existing target → resulting state → optional completion time. Derive visible state from the absolute timeline, including prior actions, so a direct seek to a late frame produces the same result as continuous playback. Do not depend on actually replaying pointer clicks, timers, or network requests to reach the state. Plan voiceover after the action path, then adjust holds to fit its meaning.
+
+Keep authentic UI components reusable and place showcase camera, pointer, and orchestration logic outside them where practical. Apply the [anchor and handoff rules](motion-choreography.md#anchor-the-pointer-to-the-component) to both renderers. Verify that layout changes cannot silently move a control away from its pointer.
+
+## Renderer choice
 
 Use their preference if given. If undecided, an existing React component set favors Remotion reuse; existing HTML/CSS/GSAP favors Hyperframes reuse. These are adaptation considerations, not claims that one tool is universally better. Do not migrate the project or install both by default.
 
@@ -56,6 +68,8 @@ Scale to scope. A small motion concept needs a concise plan; a full film handoff
 Do not produce a purportedly executable timeline with imaginary selectors. For planning-only work, use explicitly named placeholder roles and say mapping remains pending.
 
 ## Verify at the appropriate stage
+
+Use [render verification](render-verification.md) for whole-film inspection, full-resolution action checks, and optional reference comparisons. This extends the checks below; it does not require numerical similarity for an original creative treatment.
 
 - Plan: causal story, complete boundaries, no unintended gaps, transition ownership, final hold, and readable content load.
 - Prototype: first frame, each action, each result, both sides of transitions, last frame, and backward/random seeks. Test a late frame directly without playing earlier frames.

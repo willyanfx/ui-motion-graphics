@@ -40,6 +40,22 @@ Avoid simultaneous parent and child scale changes unless intentional. Camera mov
 
 For logo → cursor, inspect available vectors. Options: compatible SVG path interpolation; contraction to a shared dot/triangle then expansion; masked substitution while shape and position align; or a simple cut on movement. Identify the method honestly. Do not promise arbitrary SVG paths can directly morph. Keep morph geometry and outgoing/incoming ownership explicit.
 
+### Anchor the pointer to the component
+
+Give meaningful targets stable selectors or IDs. The action schedule should name the target and result, for example `{atFrame: 90, target: "[data-motion-id='weekly-filter']", result: "weekly-selected"}`. This is illustrative syntax, not a required framework API. A navigation target must exist in the outgoing state, before the action changes the view.
+
+Derive the hotspot from the target's actual bounds after fonts/assets and the relevant layout are ready. Use the center or a deliberate inset point in its hit area; subtract the pointer artwork's hotspot offset. If using design-time geometry, keep target, pointer, tooltip, and panel anchors in one shared layout definition instead of independent coordinate guesses.
+
+Keep the pointer in the same transformed layer as its target, or project its target through the complete transform chain exactly once. `getBoundingClientRect()` already returns viewport geometry; do not apply the camera a second time. Re-resolve geometry for state/layout changes, but freeze or deterministically derive measurements for random-access rendering. Verify the press frame at full resolution, including pointer contact, button reaction, and the resulting panel's origin.
+
+## Camera and object handoffs
+
+Represent camera motion as ordered poses with time/frame, position, zoom, transform origin, and explicit cut flags. Record the reason for each move: establish context, approach an action, follow a result, or restore the whole view. A cut switches poses; it must not accidentally interpolate through unrelated space. Hold still when reading or precision benefits from it.
+
+For rapid travel, optional directional blur can follow displacement per unit time in the rendered coordinate space. Normalize for FPS, cap the blur, and remove it during reading holds and across hard cuts. Blur the scene content with adequate background/overscan, checking frame edges for transparent strips. This is a visual approximation to test, not a measured physical shutter model.
+
+When an object bridges scenes, define the source anchor, carry interval, destination anchor, and exact ownership transfer. A temporary overlay can keep the object in output coordinates while scenes change underneath. Hide the source copy when the overlay takes over, and reveal the destination copy only when the overlay finishes. Match position, scale, shape, color, and stacking at both boundaries; check immediately before and after each transfer for duplicates or a missing frame. Remotion sequences and Hyperframes compositions must both honor this same ownership contract.
+
 ## Scene transitions
 
 Use a shared object when it links ideas, a directional wipe when the layout implies travel, a mask expansion to enter a detail, and a hard cut for a clean change of topic. Blur can soften travel but must resolve before reading. Crossfade can imply two simultaneous states; check whether that confuses the interface story.

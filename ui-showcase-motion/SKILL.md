@@ -18,6 +18,7 @@ Read existing decisions and supplied material before asking questions. Continue 
 | Break an idea into scenes | [Scene planning](references/scene-planning.md) | Storyboard, continuity, timing |
 | Design slow/fast motion, cursor behavior, morphs, transitions | [Motion choreography](references/motion-choreography.md) | Motion beats and concrete parameters |
 | Use supplied UI or hand off for implementation | [Build handoff](references/build-handoff.md) | Element map, timeline contract, tool-specific brief |
+| Check a prototype or exported film | [Render verification](references/render-verification.md) | Whole-film review, click/continuity checks, optional reference comparison |
 
 Load only the module needed now. When the user requests an end-to-end plan, move through the relevant stages. When they request building too, continue into implementation using their chosen tool and its available skill/docs. This skill is the creative and specification layer, not a substitute for a renderer's authoring guidance.
 
@@ -41,6 +42,8 @@ The seed atlas covers the creator's original 46 files (42 unique byte streams). 
 For a new project, use the reference location supplied by the user, then an existing project manifest or `references/` directory. If the media is absent, use the atlas as previously recorded evidence and say the source has not been rechecked. Ask for a location only when necessary; do not search unrelated folders.
 
 The optional [video index helper](scripts/index_videos.py) inventories local media and creates timestamped sheets. Read its usage in the analysis module. It requires Python, Pillow, FFmpeg, and FFprobe; it does not install dependencies or analyze visuals automatically.
+
+Selected measurement and continuity practices are adapted from `diko0071/remotion-video-skills`; see [source attribution and MIT notice](references/upstream-notice.md). Apply them according to the intended style. Continuous camera movement, animated holds, and exact reference replication are optional creative choices.
 
 ## What a successful handoff answers
 
