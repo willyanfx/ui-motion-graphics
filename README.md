@@ -1,13 +1,28 @@
 # UI Showcase Motion
 
-A Codex skill for planning UI showcase videos from product ideas, reference clips, and existing HTML/CSS/JS or React components.
+An agent skill for planning UI showcase videos from product ideas, reference clips, and existing HTML/CSS/JS or React components.
 
 It helps shape the story, analyze references, plan scenes and motion, and prepare a Remotion or Hyperframes handoff using `motion-plan.md` and `timeline.json`. It also guides review of prototypes and exported videos.
 
+## Install
+
+Requires Node.js and npm. Choose your agent:
+
+```sh
+# Codex
+npx skills add willyanfx/ui-motion-graphics -a codex
+
+# Claude Code
+npx skills add willyanfx/ui-motion-graphics -a claude-code
+
+# Other supported agents: choose interactively
+npx skills add willyanfx/ui-motion-graphics
+```
+
+Run inside your project, or add `-g` to install across projects. See the [Skills CLI documentation](https://github.com/vercel-labs/skills#supported-agents) for supported agents.
+
 ## Use
 
-Copy the [`ui-showcase-motion`](ui-showcase-motion/) folder into `~/.codex/skills/`, then ask:
-
-> Use $ui-showcase-motion to plan a 15-second product demo from my UI.
+Ask your agent: “Use the ui-showcase-motion skill to plan a 15-second product demo from my UI.”
 
 Share your component, assets, and any reference clips. Optional video-analysis helpers require Python 3, Pillow, FFmpeg, and FFprobe. Reference videos are not bundled.
