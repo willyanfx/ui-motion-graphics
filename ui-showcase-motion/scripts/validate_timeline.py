@@ -4,6 +4,7 @@ import argparse
 import json
 import math
 from pathlib import Path
+import re
 
 
 def validate(data):
@@ -208,6 +209,41 @@ def validate(data):
         elif isinstance(value, str) and value.startswith('proposed:'):
             warnings.append(f'{where}: proposed source or target needs verification')
     unresolved(data)
+
+    claims = objects(data.get('claims', []), 'claims')
+    claim_ids = unique(claims, 'claims')
+    for i, claim in enumerate(claims):
+        where = f'claims[{i}]'
+        value = claim.get('value')
+        if not (text(value) or (type(value) in (int, float) and math.isfinite(value))):
+            problem(where + '.value', 'must be the exact figure or wording shown or spoken')
+        if claim.get('status') not in ('verified', 'open'):
+            problem(where + '.status', 'must be verified or open')
+        elif claim['status'] == 'open' or not text(claim.get('source')) or not text(claim.get('checked')):
+            warnings.append(f'{where}: claim needs a checked source')
+
+    def copy_strings(value, where='timeline'):
+        if isinstance(value, dict):
+            for key, item in value.items():
+                if key.startswith('$'):
+                    continue
+                if key == 'text' and isinstance(item, str):
+                    yield f'{where}.{key}', item
+                else:
+                    yield from copy_strings(item, f'{where}.{key}')
+        elif isinstance(value, list):
+            for i, item in enumerate(value):
+                yield from copy_strings(item, f'{where}[{i}]')
+        elif isinstance(value, str) and (value.startswith('copy:') or value.startswith('claim:')):
+            yield where, value
+    for where, value in copy_strings({k: v for k, v in data.items() if k != 'claims'}):
+        refs = [value[6:]] if value.startswith('claim:') else re.findall(r'\{claim:([^}]*)\}', value)
+        for ref in refs:
+            if ref not in claim_ids:
+                problem(where, f'references unknown claim {ref!r}')
+        if not value.startswith('claim:') and re.search(r'\d', re.sub(r'\{claim:[^}]*\}', '', value)):
+            warnings.append(f'{where}: literal figure in copy; bind it to a claim')
+
     open_items = data.get('open', [])
     if not isinstance(open_items, list) or any(not text(v) for v in open_items):
         problem('open', 'must be an array of nonempty strings')
@@ -228,7 +264,7 @@ def main():
     errors, warnings = validate(data)
     passed = not errors and not (args.require_resolved and warnings)
     print(json.dumps({'valid': passed, 'errors': errors, 'warnings': warnings,
-                      'limits': 'Structural checks only. Does not verify DOM targets, assets, renderer behavior, reading holds, or visual/audio quality.'}, indent=2))
+                      'limits': 'Structural checks only. Does not verify DOM targets, assets, renderer behavior, reading holds, visual/audio quality, or whether claims are true.'}, indent=2))
     raise SystemExit(0 if passed else 1)
 
 

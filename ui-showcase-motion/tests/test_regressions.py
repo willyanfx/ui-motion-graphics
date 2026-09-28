@@ -84,9 +84,38 @@ class TimelineTests(unittest.TestCase):
                 mutate(data)
                 self.assertTrue(validate(data)[0])
 
+    def test_claims_bind_figures_in_copy(self):
+        def outcome(mutate):
+            data = copy.deepcopy(self.example)
+            mutate(data)
+            return validate(data)
+        benefit = lambda d: d['scenes'][4]['elements'][0]
+        claim = lambda d: d['claims'][0]
+        verify = lambda d: claim(d).update(status='verified', source='feed export', checked='2026-09-28')
+        self.assertIn('claims[0]: claim needs a checked source', validate(self.example)[1])
+        errors, warnings = outcome(verify)
+        self.assertEqual(errors, [])
+        self.assertFalse([w for w in warnings if 'claim' in w])
+        errors, warnings = outcome(lambda d: (verify(d), benefit(d).update(target="copy:'24 new arrivals, one tap.'")))
+        self.assertEqual(errors, [])
+        self.assertTrue(any('literal figure' in w for w in warnings))
+        vo = {'frame': 280, 'cue': 'benefit', 'role': 'vo', 'text': 'Twenty-four new, 7 days a week', 'file': 'vo.wav'}
+        self.assertTrue(any('audio[2].text' in w and 'literal figure' in w
+                            for w in outcome(lambda d: d['audio'].append(vo))[1]))
+        for label, mutate in [
+            ('unknown placeholder', lambda d: benefit(d).update(target="copy:'{claim:missing} new'")),
+            ('unknown claim target', lambda d: benefit(d).update(target='claim:missing')),
+            ('duplicate claim', lambda d: d['claims'].append(copy.deepcopy(claim(d)))),
+            ('missing value', lambda d: claim(d).pop('value')),
+            ('unknown status', lambda d: claim(d).update(status='approved')),
+        ]:
+            with self.subTest(label=label):
+                self.assertTrue(outcome(mutate)[0])
+
     def test_malformed_containers_report_errors(self):
         for field, value in [('canvas', []), ('scenes', {}), ('scenes', [None]), ('layers', [None]),
-                             ('transitions', [None]), ('audio', [False]), ('open', {}), ('renderer', [])]:
+                             ('transitions', [None]), ('audio', [False]), ('open', {}), ('renderer', []),
+                             ('claims', {}), ('claims', [None])]:
             with self.subTest(field=field, value=value):
                 data = copy.deepcopy(self.example)
                 data[field] = value

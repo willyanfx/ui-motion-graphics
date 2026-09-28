@@ -4,13 +4,14 @@ Scale review to the assignment: a plan needs internal consistency; a delivered f
 
 ## Review loop
 
-1. Confirm the composition loads, then render a draft of the full sequence. Review the whole film for story, continuity, reading holds, clipping, and missing assets. If you can't play video, say which checks were sampled only.
-2. Inspect problem passages more densely — full-resolution crops and adjacent frames for interaction details.
-3. When the user or your own review reacts, say what works, specifically — it becomes a lock. Name the one main problem and its [category](#problem-categories), and whether it's local to a scene or structural.
-4. Change only that layer and state the locks alongside the fix ("keep camera, hold, and colors; shorten pointer travel from 14 to 10 f"). Don't rebuild a scene to fix one detail or re-render the whole film for one passage.
-5. Re-render the changed passage, then check its boundaries in the full export. Test late-frame and backward seeking in the renderer.
-6. Update the scene's status and the verification log. If the note should apply everywhere, add it to the plan's global rules.
-7. Report blocking defects separately from polish. Treat automated or AI review findings as candidates until confirmed on real frames. Don't override the chosen creative direction to satisfy a generic score.
+1. Confirm the composition loads, then render the hardest 2–4 s first — usually a press and its result, a shared-object handoff, a morph, or a loop seam. Step 12–24 adjacent frames at full resolution, and render one frame after seeking to it from both directions. Fix what that sample shows before spending a full render.
+2. Render a draft of the full sequence. Review the whole film for story, continuity, reading holds, clipping, and missing assets. If you can't play video, say which checks were sampled only.
+3. Inspect problem passages more densely — full-resolution crops and adjacent frames for interaction details.
+4. When the user or your own review reacts, say what works, specifically — it becomes a lock. Name the one main problem and its [category](#problem-categories), and whether it's local to a scene or structural.
+5. Change only that layer and state the locks alongside the fix ("keep camera, hold, and colors; shorten pointer travel from 14 to 10 f"). Don't rebuild a scene to fix one detail or re-render the whole film for one passage.
+6. Re-render the changed passage, then check its boundaries in the full export. Test late-frame and backward seeking in the renderer.
+7. Update the scene's status and the verification log. If the note should apply everywhere, add it to the plan's global rules.
+8. Report blocking defects separately from polish. Treat automated or AI review findings as candidates until confirmed on real frames. Don't override the chosen creative direction to satisfy a generic score.
 
 ### Problem categories
 
@@ -23,11 +24,12 @@ The one diagnostic vocabulary for this skill; other modules point here.
 | Pointer | Hotspot misses the target, travel too slow or fast, press out of sync with the reaction |
 | Continuity | Persistent UI flashes or replays its entrance, duplicate object at a handoff, an old state returns |
 | Camera | Unmotivated move, press during a move, frame edge revealed, blur left on |
-| Timing | Hold too short to read, equal time on every beat, overlapping moves steal focus |
+| Timing | Hold too short to read, equal time on every beat, overlapping moves steal focus, a dead stretch where nothing changes and nothing is being read |
 | Curve | Ease or spring feels wrong for the intent (bouncy on serious UI, stiff on playful) |
-| Readability | Text too small for placement, distortion during a hold, content outside the safe area |
-| Fidelity | UI differs from the source, wrong font or asset, placeholder shipped as real |
-| Renderer | Seek mismatch, dropped frames, font flash, wrong export size, FPS, or duration |
+| Readability | Text too small for placement or unreadable at phone size, text blurred by a scaled layer, distortion during a hold, content outside the safe area |
+| Fidelity | UI differs from the source, wrong font or asset, placeholder shipped as real, color drifts from the plan's palette between shots |
+| Claim | A figure on screen or in VO not bound to a verified claim, a value that differs from its source, a credit line that overstates what was generated |
+| Renderer | Seek mismatch, the same frame rendering differently twice, dropped frames, font flash, wrong export size, FPS, or duration |
 | Sound | Hit early or off its frame, a sound on every motion, music masking VO, loudness off target or clipping, click at a loop seam |
 
 For Timing and Curve, [motion choreography](motion-choreography.md#design-rhythm-before-curves) narrows it further: scene rhythm, velocity profile, or overlap.
@@ -40,6 +42,14 @@ For Timing and Curve, [motion choreography](motion-choreography.md#design-rhythm
 - On fast camera moves: frame edges, text legibility after settling, blur fully removed. Intended hard cuts must not become interpolated moves.
 - For a seamless loop, play the seam at least twice and step the last and first five frames; see [kinetic type verification](kinetic-type.md#verification-additions).
 - With sound: watch once muted and once with audio; follow the [sound checks](sound-design.md#verification-additions).
+- **Phone size:** on a phone a vertical film plays about 360–430 px wide; check at the small end. Make a sheet at that width and read every caption, label, and number from it without zooming:
+
+  ```sh
+  ffmpeg -i render.mp4 -vf "fps=1,scale=360:-1,tile=5x3" -frames:v 1 phone-check.png
+  ```
+
+  For a longer film, raise `tile` or lower `fps` so the sheet covers every held text beat.
+- **Repeatability:** render one busy frame twice, each in a fresh renderer process (e.g. `npx remotion still` with `--frame`), and compare file hashes (`shasum`). Different hashes mean state leaked between frames: unseeded randomness, a timer, or a measurement taken during playback. If only antialiasing differs, diff the images; that's GPU noise, not state.
 - The final frame and end hold look intended; exported duration, dimensions, FPS, assets, and audio are verified separately.
 
 ## Optional reference comparison

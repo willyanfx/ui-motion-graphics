@@ -37,6 +37,24 @@ Filenames aren't visual evidence. Separate screen-recording camera motion from a
 
 For timing work keep an event table: source timestamp/frame and FPS → visible action → target → bounds or anchor → confidence → proposed destination timing. Keep measured source timing separate from new creative timing. Convert to the destination FPS once; don't stretch one film to fit the other. A new dense pass on a clip doesn't upgrade the atlas's coverage for other clips.
 
+## Remake an existing film
+
+When the user brings their own earlier film (an old launch video, a hand-animated promo) to rebuild, it's a source, not a reference: its copy, identity, and structure are theirs to reuse. Confirm they own it, and ask what the remake is for — the product changed, the pacing felt off, a new aspect ratio, or making it editable.
+
+1. Inventory it like any clip, then do a close timing match of the whole film: an event table of every cut, move, and text hold at the original's FPS.
+2. Collect the real design files (Figma exports, the live component, logo vectors) and rebuild from those. Tracing frames from the video reproduces its compression and loses editability.
+3. Write a beat map before planning scenes:
+
+| Original window | Beat | Keep / change / drop | New scene | Rebuilt from |
+|---|---|---|---|---|
+| *0.0–2.4 s* | *Logo on blue* | *keep* | *S1* | *logo.svg, brand tokens* |
+| *2.4–6.0 s* | *Three app screens in one pass* | *change: one screen per beat, longer holds* | *S2–S3* | *live component* |
+
+4. Lock what must survive (music, duration, key copy) in the plan's global rules; everything else follows the normal modules. Base holds on [reading holds](motion-choreography.md#reading-holds), not the original's timing. Remakes tend to come out too fast, and pacing notes are the main lever.
+5. Compare corresponding beats with [`compare_videos.py`](../scripts/compare_videos.py). A difference is a question, not a defect.
+
+If it will be posted beside the original, the credit line says what was rebuilt, from which files, and who revised the pacing.
+
 ## Reference card
 
 For each clip: ID and filename; type (UI interaction, product showcase, brand motion, editorial/type, process recording); checked windows and coverage; visible action; transition mechanism; visual anchor; pacing evidence; reusable principle; possible application; caveat.

@@ -7,6 +7,7 @@ Check the conversation and project files first, then invite only what's missing 
 | Material | Ask for when missing | What it enables |
 |---|---|---|
 | Component source | HTML or React files and the entry point | Map the storyboard to real elements |
+| Live product URL | When no source is available, or alongside it | Real screenshots, logo, colors, and fonts ([capture from a URL](#capture-from-a-live-url)) |
 | Styling | Component CSS, shared styles/tokens, font files or references | Keep the UI's real appearance |
 | Behavior | JS, existing animation code, dependencies, how to preview | Reuse behavior, spot animation conflicts |
 | Visual assets | Logo (SVG preferred for shape work), icons, images, video, device mockups | Plan feasible reveals and transitions |
@@ -18,6 +19,12 @@ Start with one short invitation adapted to context: "Share the component's HTML,
 
 Mark each material as supplied, found in project, missing, or placeholder. Check that referenced paths resolve and flag external dependencies before promising a self-contained render. Never silently replace a missing brand asset or rebuild supplied UI from an approximation; offer a labeled placeholder for planning and request the real asset before work that depends on it. If the user is unavailable, build with the labeled placeholder and list the asset as [open].
 
+### Capture from a live URL
+
+A URL is a real source when the user owns the product or has permission to show it; confirm that before capturing. With a browser tool, load the page at the target viewport (390–430 px wide for vertical films, the real desktop width for 16:9). Capture full-resolution screenshots of the states the story needs, and read the logo (prefer the SVG), colors, and font families from the page's markup and CSS. Save everything to an `assets/` folder and list what you found — file, what it shows, where it came from — before animating anything.
+
+Screenshots are stills: they support crops, camera moves, masks, and overlays, not live state changes. If a scene needs a real interaction (a filter, a typed field), get the component source or record the interaction. Never redraw the product UI from memory or approximation. Record each capture's URL and date in the asset map; mark any state that required logging in or seeded data.
+
 ## Inspect the supplied UI
 
 Read the entry HTML, relevant CSS/JS, component files, package manifest, asset paths, and font loading. Identify real selectors/components, bounds, responsive layout, clipping, stacking contexts, existing transforms, and states worth showing. Use a browser tool to see it rendered when available — source reading and visual checking are different evidence.
@@ -25,6 +32,10 @@ Read the entry HTML, relevant CSS/JS, component files, package manifest, asset p
 Build the element map (section 5 of the [plan template](../assets/motion-plan-template.md)): file → selector/component → role in the film → existing behavior → planned animation. A screenshot gives geometry, not editable DOM; keep any unverified selector marked `proposed:`.
 
 Capture a baseline before adapting. Leave the source UI intact and build a separate composition for fake pointers, camera wrappers, staged data, or frame-driven interactions. Never trigger live purchases, messages, or destructive actions to stage a demo. Use deterministic fixtures, label fictional data, and don't invent product claims.
+
+### Bind figures to claims
+
+Every number, price, stat, or factual claim that appears on screen or in VO comes from the timeline's `claims` block — `id`, exact `value`, `source`, `checked` date, and `status` (`verified` or `open`) — never typed into copy. Reference it as `{claim:id}` inside `copy:` strings or a VO cue's `text`, or as a `claim:id` target for a standalone figure. The build reads the value from the claim, so a correction changes one place. The validator flags literal digits in copy and unknown claim IDs; it can't tell whether a figure is true, so the source and checked date carry that. When no source exists yet, keep the claim `open` and plan the scene so the figure can be dropped without re-timing it.
 
 ## Choose the continuity model
 
@@ -72,9 +83,10 @@ Source: [Hyperframes GSAP guide](https://hyperframes.heygen.com/guides/gsap-anim
 Scale to scope. A full handoff includes:
 
 1. **`motion-plan.md`** — from the [template](../assets/motion-plan-template.md): current point and global rules, brief, treatment, references, materials, element map, scenes, recipes, transitions, assumptions, verification log.
-2. **`timeline.json`** — follow the shape of [`timeline.example.json`](../assets/timeline.example.json): canvas/FPS/duration in frames, stable scene IDs, absolute frame boundaries, element targets, keyframes/eases/springs, camera poses, action schedule, transition ownership, audio cues, renderer, open items.
-3. **Asset map** — plan section 4: existing files, adaptations, missing assets, fonts, footage, logo vectors, provenance notes.
+2. **`timeline.json`** — follow the shape of [`timeline.example.json`](../assets/timeline.example.json): canvas/FPS/duration in frames, stable scene IDs, absolute frame boundaries, element targets, keyframes/eases/springs, camera poses, action schedule, transition ownership, audio cues, claims, renderer, open items.
+3. **Asset map** — plan section 4: existing files, adaptations, missing assets, fonts, footage, logo vectors, and the pixel source of each shot.
 4. **Build prompt** — plan section 10: implement the plan with the supplied UI, preserve mapped elements, resolve named open items, build deterministic seeking and preview, report render/QA evidence.
+5. **Credit line**, when the film will be posted — plan section 4: what the live UI, supplied footage, coded animation, and any generated assets each contributed. "One prompt", "all code", "no external assets", and "no human edits" are separate claims; state only the ones that are true.
 
 For planning-only work, use named placeholder roles in `timeline.json` and say that mapping is pending — never present imaginary selectors as executable.
 
@@ -90,9 +102,9 @@ python3 /path/to/ui-showcase-motion/scripts/validate_timeline.py timeline.json
 python3 /path/to/ui-showcase-motion/scripts/validate_timeline.py timeline.json --require-resolved
 ```
 
-Checks include positive canvas settings, contiguous scene coverage, unique IDs, ordered in-range keyframes and camera poses, action/completion bounds, holds, transition references and overlap ownership, and audio cue bounds and action sync. Transition `owner`, when present, names an existing layer ID covering the overlap. A hard cut or continuous boundary uses `[boundary, boundary]`. Keyframes within one track use distinct ascending frames; combine same-frame properties into one object.
+Checks include positive canvas settings, contiguous scene coverage, unique IDs, ordered in-range keyframes and camera poses, action/completion bounds, holds, transition references and overlap ownership, audio cue bounds and action sync, and claim references. Transition `owner`, when present, names an existing layer ID covering the overlap. A hard cut or continuous boundary uses `[boundary, boundary]`. Keyframes within one track use distinct ascending frames; combine same-frame properties into one object.
 
-Planning mode fails on structural errors and reports declared placeholders, open decisions, and unresolved audio as warnings. `--require-resolved` also fails on those warnings. Neither mode verifies source selectors, asset existence, property conflicts, reading time, or renderer output; keep those checks in intake and visual review. Intentional black frames still need an explicit scene so coverage is unambiguous. Additional renderer-specific fields remain allowed.
+Planning mode fails on structural errors and reports declared placeholders, open decisions, unresolved audio, open claims, and literal figures in copy as warnings. `--require-resolved` also fails on those warnings. Neither mode verifies source selectors, asset existence, property conflicts, reading time, or renderer output; keep those checks in intake and visual review. Intentional black frames still need an explicit scene so coverage is unambiguous. Additional renderer-specific fields remain allowed.
 
 ## Verify at each stage
 

@@ -26,6 +26,7 @@ Keep one plan per project and update it in place. Film status tracks evidence �
 | Runtime | e.g. 12 s | |
 | Focus | One interaction / one screen / a journey across screens | |
 | Feel | e.g. calm and precise | |
+| Palette | Background (dark or light neutral), primary, accent — hex or the product's tokens. Pick deliberately; UI films use dark and light about equally often | |
 | Renderer | Remotion / Hyperframes | |
 | Story shape | Feature proof / problem → relief / before-after / journey / assembly / list / question → answer / loop | |
 | Sound | Mode (music-led / sound-design-led / hybrid / voice-led / silent-first), BPM if music-led, loudness target | |
@@ -49,14 +50,24 @@ Keep one plan per project and update it in place. Film status tracks evidence �
 
 ## 4. Materials and asset map
 
-| Material | Location | State |
-|---|---|---|
-| *Component source* | *`src/components/ProductGrid.tsx`* | *supplied* |
-| Styles & fonts | | |
-| Logo (SVG) | | |
-| Images / icons / footage | | |
-| Sample data | | |
-| Audio | | |
+| Material | Location | State | Pixel source |
+|---|---|---|---|
+| *Component source* | *`src/components/ProductGrid.tsx`* | *supplied* | *live UI rendered in the composition* |
+| Styles & fonts | | | |
+| Logo (SVG) | | | |
+| Images / icons / footage | | | |
+| Sample data | | | |
+| Audio | | | |
+
+Pixel source is what puts that material on screen: live UI rendered in the composition, a screen recording, supplied footage, coded animation, or a generated asset (name the tool).
+
+**Figures and claims** — every number or factual statement shown or spoken; mirrors `claims` in `timeline.json`.
+
+| ID | Exact value | Source | Checked | Used in | Status |
+|---|---|---|---|---|---|
+| *orders-day* | *12,400* | *Analytics export, 30-day average* | *2026-09-27* | *S3 caption* | *verified* |
+
+**Credit line** (if posting): what the live UI, supplied footage, coded animation, and any generated assets each contributed, and what people revised. "One prompt", "all code", "no external assets", and "no human edits" are separate claims — state only the true ones.
 
 ## 5. Element map
 
@@ -93,7 +104,7 @@ S2 pointer (touch indicator)
   travel: 110→124 (14 f ≈ 467 ms at 30 fps), cubic-bezier(0.22, 1, 0.36, 1)
   pause: 124→130 (6 f)
   press: scale 1→0.9 over 130→133, back to 1 over 133→137; ripple 130→141
-  result: chip state 130→135; cards reflow 136→151, spring 170/26/1
+  result: chip state 130→135; cards reflow 136→151, spring 170/20/1
   hold: 151→189 (38 f = 1.27 s ≥ 1.0 s × 1.2 phone)
 ```
 
@@ -110,7 +121,7 @@ S2 pointer (touch indicator)
 
 ## 10. Build prompt
 
-Implement this plan in <renderer> using the supplied component at <path>. Preserve the mapped elements and their layout. Keep persistent UI mounted across scenes and derive state from the absolute frame. Resolve these open items: <list>. Provide deterministic seeking and a preview. Report render/QA evidence: <frames to check — each press, both sides of each transition, last frame>.
+Implement this plan in <renderer> using the supplied component at <path>. Preserve the mapped elements and their layout. Keep persistent UI mounted across scenes and derive state from the absolute frame. Read every figure from `claims`; never type numbers into copy. Resolve these open items: <list>. Provide deterministic seeking and a preview. Render the hardest 2–4 s (<passage>) before the full draft. Report render/QA evidence: <frames to check — each press, both sides of each transition, last frame>.
 
 ## 11. Verification log
 

@@ -30,7 +30,7 @@ Offer up to three compact treatments, each with:
 - One or two reference moments and exactly what's borrowed.
 - Ending or loop behavior, and the effort difference.
 
-A treatment is a [story shape](scene-planning.md#story-shapes) plus a motion approach. Example treatments for a dashboard (the last suits a teaser or social loop):
+A treatment is a [story shape](scene-planning.md#story-shapes) plus a motion approach. Example treatments for a dashboard (the last two suit a teaser or social loop):
 
 **Follow the pointer:** logo resolves into a pointer, pointer picks a real filter, chart changes, camera returns to the full dashboard. Best for cause and effect. Needs a deliberate silhouette bridge. Shape: feature proof.
 
@@ -39,5 +39,7 @@ A treatment is a [story shape](scene-planning.md#story-shapes) plus a motion app
 **Editorial feature tour:** bold short statement, close view of one meaningful action, clean cut to the next benefit, composed end card. Best for launches. Needs disciplined copy and reading holds. Shape: numbered list or feature proof.
 
 **Type-led loop:** product name on a fixed poster grid, one real control drives a live preview, feature pills pile up, a conveyor of benefit words lands on the CTA and carries the seam back to the start. Best for Reels and teasers. Needs a variable font and honest feature copy ([kinetic type](kinetic-type.md)). Shape: loop story.
+
+**One container, never cut:** a single element changes size, corner radius, and fill through 8–12 real product states (a button becomes a field, a loader, a success check, a card, a chart, a ⌘K palette), while its content swaps inside. A pointer causes every change, one per beat, and the last frame equals the first. Best for showing a whole product flow in 10–15 s. Needs the states listed on the beat grid before any code, [retargeted springs and content-swap timing](motion-choreography.md#content-inside-a-morphing-container), and a [loop seam](kinetic-type.md#loops). Shape: loop story or assembly.
 
 Ask for a choice or combination when the user wants to collaborate; if they already asked you to decide and build, decide. Record choices, rejected approaches, open questions, and assumptions in `motion-plan.md` (start from the [template](../assets/motion-plan-template.md)).
