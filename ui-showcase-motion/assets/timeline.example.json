@@ -1,5 +1,5 @@
 {
-  "$comment": "Complete planning example for a 15 s vertical Reel; source UI, brand assets, and audio remain proposed. This is not a rendered film. Conventions: frames are the canonical unit (seconds derived; convert with round-half-up, i.e. floor(s*fps + 0.5)). Scene intervals are half-open [start, end), so the last shown frame is end-1. Keyframes are absolute frames inside their scene's [start, end), or inside a layer's [from, until). holdUntil and until are exclusive. Transition overlaps belong to the tail of the outgoing scene; anything that must animate IN during an overlap lives in a layer. Camera poses: x/y are output-pixel translations applied after zoom around 'origin'; 'cut': true jumps to the pose instead of interpolating. Action types: click | tap | hover | type | scroll | drag | system; 'completeAt' is the frame the resulting state is fully settled. Add fields when a project needs them (e.g. measured 'box' geometry); don't rename these. Audio cue 'sync' names what its frame locks to (press | arrival | peak | completeAt | beat | loose); see references/sound-design.md. stagger.from names the origin of a spread: a selector (the action's target), or 'start' | 'end' | 'center'. Replace every 'proposed:' source or selector with a verified one before building. Scene camera poses apply to the stage and scene-space overlays; output-space elements remain fixed. Each subsequent scene starts from the preceding camera pose. Transition owner names a layer ID. Layer zIndex is relative to the output canvas; scene copy defaults to 10. Elements live for their scene interval; interpolate each property between its specified keys and clamp outside them. Later reveals must explicitly start hidden. With no camera pose, use the identity camera.",
+  "$comment": "Complete planning example for a 15 s vertical Reel; source UI, brand assets, and audio remain proposed. This is not a rendered film. Conventions: frames are the canonical unit (seconds derived; convert with round-half-up, i.e. floor(s*fps + 0.5)). Scene intervals are half-open [start, end), so the last shown frame is end-1. Keyframes are absolute frames inside their scene's [start, end), or inside a layer's [from, until). holdUntil and until are exclusive. Transition overlaps belong to the tail of the outgoing scene; anything that must animate IN during an overlap lives in a layer. Camera poses: x/y are output-pixel translations applied after zoom around 'origin'; 'cut': true jumps to the pose instead of interpolating. Action types: click | tap | hover | type | scroll | drag | system; 'completeAt' is the frame the resulting state is fully settled. Add fields when a project needs them (e.g. measured 'box' geometry); don't rename these. Audio cue 'sync' names what its frame locks to (press | arrival | peak | completeAt | beat | loose); see references/sound-design.md. stagger.from names the origin of a spread: a selector (the action's target), or 'start' | 'end' | 'center'. Replace every 'proposed:' source or selector with a verified one before building. Every figure shown or spoken comes from 'claims' (value, source, checked date, status verified | open): reference it as {claim:id} inside copy or VO 'text', or as a 'claim:id' target; literal digits in copy are flagged. Scene camera poses apply to the stage and scene-space overlays; output-space elements remain fixed. Each subsequent scene starts from the preceding camera pose. Transition owner names a layer ID. Layer zIndex is relative to the output canvas; scene copy defaults to 10. Elements live for their scene interval; interpolate each property between its specified keys and clamp outside them. Later reveals must explicitly start hidden. With no camera pose, use the identity camera.",
   "version": 2,
   "canvas": {
     "width": 1080,
@@ -254,7 +254,7 @@
               "state": "filter=new",
               "spring": {
                 "stiffness": 170,
-                "damping": 26,
+                "damping": 20,
                 "mass": 1
               }
             }
@@ -363,7 +363,7 @@
       "elements": [
         {
           "id": "benefit",
-          "target": "copy:'New arrivals, one tap.'",
+          "target": "copy:'{claim:new-this-week} new arrivals, one tap.'",
           "space": "output",
           "style": {
             "fontSize": 72,
@@ -530,9 +530,20 @@
       "status": "open"
     }
   ],
+  "claims": [
+    {
+      "id": "new-this-week",
+      "value": 24,
+      "unit": "products",
+      "source": "proposed:product feed, new-arrivals count for the capture week",
+      "checked": null,
+      "status": "open"
+    }
+  ],
   "open": [
     "Verify ProductGrid.tsx, the ProductGrid component, and filter/card selectors against the supplied UI; measure the filter anchor after layout.",
     "Supply the real brand logo and confirm the feature copy.",
+    "Confirm the new-arrivals count against the product feed on the capture date, or drop the figure from the benefit line.",
     "Choose licensed tap and confirmation audio or explicitly change to a silent delivery."
   ]
 }

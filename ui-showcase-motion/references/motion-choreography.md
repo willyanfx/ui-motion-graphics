@@ -55,14 +55,62 @@ Use the headline row for a standalone headline of up to six words; use the sente
 
 ### Springs
 
-| Feel | stiffness / damping / mass | Use for |
-|---|---|---|
-| Precise, no overshoot | 200 / 30 / 1 | Serious UI, charts, text |
-| Soft settle, tiny overshoot | 170 / 26 / 1 | Cards, panels, most UI |
-| Playful | 250 / 16 / 1 | Badges, dots, pointer pops |
-| Heavy | 120 / 22 / 1.5 | Large devices or full-screen moves |
+| Feel | stiffness / damping / mass | Overshoot | Settles within 1% | Use for |
+|---|---|---|---|---|
+| Precise | 200 / 30 / 1 | none | 0.53 s [16] | Serious UI, charts, text |
+| Soft settle, tiny overshoot | 170 / 20 / 1 | ~2% | 0.50 s [15] | Cards, panels, most UI |
+| Playful | 250 / 16 / 1 | ~16% | 0.56 s [17] | Badges, dots, pointer pops |
+| Heavy | 120 / 22 / 1.5 | ~1% | 0.67 s [20] | Large devices or full-screen moves |
 
-Remotion's `spring()` takes these as `config: {stiffness, damping, mass}`; GSAP has no native spring — approximate with `back.out(1.4)` or `elastic.out(1, 0.6)`.
+Overshoot and settle times are computed from the spring below, so they hold in any renderer that implements the same physics. Damping ratio `ζ = damping / (2·√(stiffness·mass))` decides the character: ζ ≥ 1 never overshoots, and anything near 1 looks the same as ζ = 1. So 170/26/1 (ζ ≈ 0.997) looks exactly like the precise preset.
+
+Remotion's `spring()` takes these as `config: {stiffness, damping, mass}` and is already a pure function of the frame. GSAP has no native spring. Use the function below as the ease:
+
+```js
+// Closed-form damped spring from 0 to 1; t in seconds since the move started. Pure function of time.
+function spring(t, k = 170, d = 20, m = 1) {
+  if (t <= 0) return 0;
+  const w0 = Math.sqrt(k / m), z = d / (2 * Math.sqrt(k * m));
+  if (Math.abs(z - 1) < 1e-6) return 1 - Math.exp(-w0 * t) * (1 + w0 * t);   // critical
+  if (z < 1) {
+    const wd = w0 * Math.sqrt(1 - z * z);
+    return 1 - Math.exp(-z * w0 * t) * (Math.cos(wd * t) + (z * w0 / wd) * Math.sin(wd * t));
+  }
+  const s = w0 * Math.sqrt(z * z - 1), r1 = -z * w0 + s, r2 = -z * w0 - s;   // overdamped
+  return 1 + (r2 * Math.exp(r1 * t) - r1 * Math.exp(r2 * t)) / (r1 - r2);
+}
+// GSAP/Hyperframes: ease: p => (p >= 1 ? 1 : spring(p * 0.63, 170, 20)), duration: 0.63
+```
+
+For an ease, use the time to settle within 0.1% (about 1.3–1.5× the table's 1% time; 0.63 s for 170/20/1) so the final snap to 1 is invisible.
+
+Don't use a shortcut formula that treats every ζ > 1 as critically damped. It gets the precise preset wrong.
+
+#### Retarget without restarting
+
+When a value changes target several times — a pointer's position, a container's width, a counter — don't restart a spring at each change. That snaps the velocity to zero and looks like a hitch. Sum one spring per change instead, each starting at its own frame:
+
+```js
+// keys: [[t0, v0], [t1, v1], ...] sorted by time
+const track = (t, keys, k, d, m) =>
+  keys.slice(1).reduce((v, [ti, vi], i) => v + (vi - keys[i][1]) * spring(t - ti, k, d, m), keys[0][1]);
+```
+
+The motion stays continuous through each change, and any frame can still be rendered directly. In Remotion, sum `spring({frame, fps, delay: startFrame, config})` terms the same way. When a `timeline.json` track gives one property several spring keyframes, build it this way rather than restarting at each key.
+
+#### Stretching indicators
+
+A tab underline, selection pill, or segmented-control thumb reads as elastic, not sliding, when its two edges travel on different springs. Run the left-edge stops through a stiff spring (start at 300/30/1) and a soft one (150/24/1) and take the smaller value; run the right-edge stops through the same pair and take the larger. The edge in the direction of travel leads, the other catches up, and both settle on the target, so it works when tabs have different widths.
+
+#### Content inside a morphing container
+
+When one container changes shape and its content swaps (button → loader → success, card → panel), the container leads:
+
+- Outgoing content is gone before the morph starts — fade out over ~100 ms [3] ending at the morph's first frame. It never scales or squashes with the container.
+- Incoming content starts ~80 ms [2–3] after the morph starts and fades in over ~120 ms [4]. It's fully settled before its reading hold begins.
+- A short blur (≤ 6 px) on the swap is optional; it covers the handover but must be gone by the hold.
+
+Text overlapping during a swap is the most common defect in this pattern. Step through every swap frame by frame.
 
 ### When to change them
 
@@ -96,6 +144,19 @@ For 9:16 placements (1080×1920), start with these and check the platform's curr
 - **Cause as origin:** a change spreads from what caused it — the ripple starts at the pressed control, a stagger radiates from the source card, a reflow moves away from the insertion point. Name the origin and direction in the recipe (`stagger from: pressed chip, outward`); top-left-first by default reads as unrelated to the action.
 - **Secondary action:** a click pulse or highlight supports the main change; drop it if the state change already explains itself.
 - **Pose to pose:** define entry, peak, and resolved states before interpolating. Seed procedural particles so they repeat.
+
+## Avoid the default look
+
+Code-rendered films without a reference or a plan drift toward the same look. Treat these as defaults to replace, not effects to add, unless the brief asks for them:
+
+- A centered title on a gradient background.
+- Everything fading in; opacity is the only motion.
+- Decorative corner labels, frame borders, timecodes, or fake chrome around the film that carry no information. A deliberate type grid with real labels ([kinetic type](kinetic-type.md#system-rules-across-the-set-int)) is different.
+- Glow or gradient on real UI chrome, or particle bursts that don't come from an action.
+- A dead stretch: nothing changes and nothing is being read. A reading hold is not dead time; an empty pause after it is.
+- Every scene built the same way (same entrance, same duration, same camera push).
+
+The fix is usually upstream: a real UI moment, a named reference, or a clearer action → result, not a different effect.
 
 ## Motion recipe
 
@@ -131,6 +192,10 @@ Represent camera motion as ordered poses: frame, position, zoom, transform origi
 Avoid default camera grammar: a slow push-in on every screen, a 3D tilt or float with no reason, drift that continues through a reading hold, a zoom that exists only to fill time. Prefer moves that do a job: start close on the detail and earn the wide view, reveal the layout past a foreground element, follow the result as it moves, or hold still. Describe the move by its cause — "the camera follows the card as it expands into the panel" — not just "zoom in".
 
 Directional blur for fast travel: scale it with displacement per frame in rendered coordinates, normalize for FPS, cap it (start near 12 px at 1080p), and remove it during holds and across hard cuts. Use overscan so frame edges don't show transparent strips.
+
+For true motion blur, render several subframes per output frame and average them. 4 subframes is a good start and costs 4× the render time. Moving things smear along their real path, and anything still stays sharp, so holds need no special handling. In Remotion, `@remotion/motion-blur` provides this (check its current API). For an HTML renderer, capture at `fps × N` and blend groups of N frames with FFmpeg's `tmix` before encoding. Subframes need a truly seekable renderer; any state carried between frames breaks them.
+
+Don't put `will-change: transform` (or a forced compositing layer) on anything the camera scales. The browser snapshots the layer at its original size and stretches the bitmap, so text blurs during a push-in and can stay soft after it lands. Let the camera wrapper scale real vector content.
 
 When an object bridges scenes, define the source anchor, carry interval, destination anchor, and the exact ownership transfer. A temporary overlay can hold the object in output coordinates while scenes change underneath: hide the source when the overlay takes over, reveal the destination when it finishes. Match position, scale, shape, color, and stacking at both ends, and check the frames immediately before and after each transfer for duplicates or a missing frame. Remotion sequences and Hyperframes compositions both follow this contract.
 

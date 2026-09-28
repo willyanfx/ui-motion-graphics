@@ -54,7 +54,7 @@ Creative defaults at 30 fps, frames in brackets; tune in preview. None of these 
 | Tile wipe | ~18 f | 4×7 grid on 1080×1920, diagonal stagger 1 f, each tile 6–8 f |
 | Pill drop | 4–6 f apart | Spring 250/16/1, rotation ±4–12° seeded per pill; stop adding at ~9 pills |
 | Gravity exit | 15 f | `Easing.bezier(0.64, 0, 0.78, 0)` on y, rotation grows 1.5×, 1 f stagger from the top of the pile |
-| Column step | 18 f per face | Spring 170/26/1 or ease-in-out; face hold ≥ 1.8 s (statistic hold × 1.2 on phone) |
+| Column step | 18 f per face | Spring 170/20/1 or ease-in-out; face hold ≥ 1.8 s (statistic hold × 1.2 on phone) |
 | Chapter length | ≥ 1.8 s | Headline hold × 1.2 on phone; a one-word chapter can go to ~1.2 s only if the idea repeats |
 | Typed text | 2 f per character | Caret steady while typing, blinking ~0.5 s when idle; don't type more than ~16 characters on camera |
 
@@ -70,7 +70,7 @@ Reading holds from [motion choreography](motion-choreography.md#reading-holds) s
 
 ## Loops
 
-A loop is a scene whose last frame hands off to frame 0. Put the seam inside a transition (a wipe, a conveyor, a gravity exit), never inside a hold, so the jump is covered by motion. Frame `durationInFrames − 1` must lead into frame 0 exactly as any frame leads into the next: same positions, colors, and axis values once the transition completes. For a two-half loop, make the second half the first with swapped colors and derive both from one function of `frame % half`. Decide early whether the placement loops (Reels, web backgrounds) or ends on a still end card; don't do both. A music loop must match the film loop exactly ([beat grid](sound-design.md#music-and-the-beat-grid)).
+A loop is a scene whose last frame hands off to frame 0. Put the seam inside a transition (a wipe, a conveyor, a gravity exit), never inside a hold, so the jump is covered by motion. Frame `durationInFrames − 1` must lead into frame 0 exactly as any frame leads into the next: same positions, colors, and axis values once the transition completes, and the same velocities. A pointer or spring still moving at the last frame must be moving the same way at frame 0, or the seam shows as a hitch even when positions match. For a two-half loop, make the second half the first with swapped colors and derive both from one function of `frame % half`. Decide early whether the placement loops (Reels, web backgrounds) or ends on a still end card; don't do both. A music loop must match the film loop exactly ([beat grid](sound-design.md#music-and-the-beat-grid)).
 
 ## Timeline fields
 
@@ -114,4 +114,4 @@ Check the renderer's current docs before writing code.
 
 ## Verification additions
 
-On top of [render verification](render-verification.md): play the seam at least twice in a row; step the last 5 and first 5 frames; confirm the axis actually changes continuously (inspect adjacent frames mid-sweep); check that giant words don't clip at the canvas edge except where intended; check no fallback font appears in frame 0–3; confirm every distorted word is fully restored before its hold starts.
+On top of [render verification](render-verification.md): play the seam at least twice in a row (`ffmpeg -stream_loop 1 -i render.mp4 -c copy loop-check.mp4`); step the last 5 and first 5 frames and compare each moving object's per-frame displacement across the seam; confirm the axis actually changes continuously (inspect adjacent frames mid-sweep); check that giant words don't clip at the canvas edge except where intended; check no fallback font appears in frame 0–3; confirm every distorted word is fully restored before its hold starts.

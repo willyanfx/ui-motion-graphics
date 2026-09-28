@@ -14,6 +14,7 @@ Read existing decisions and supplied material first, and continue from the curre
 | User needs | Load | Produce |
 |---|---|---|
 | Help deciding what to show | [Discovery](references/discovery.md) | Brief and 2–3 distinct directions |
+| Remake an existing film of theirs (old launch video plus design files) | [Reference analysis](references/reference-analysis.md#remake-an-existing-film) | Beat map from original to new scenes, what's kept and what changes |
 | Understand or choose reference clips | [Reference analysis](references/reference-analysis.md), then entries in the [reference atlas](references/reference-atlas.md) | Timestamped observations and reusable patterns |
 | Break an idea into scenes or pick a story shape | [Scene planning](references/scene-planning.md) | Story shape, storyboard, continuity, timing |
 | Design pacing, pointer behavior, morphs, camera, transitions | [Motion choreography](references/motion-choreography.md) | Motion beats with concrete starting values |
@@ -50,6 +51,7 @@ State this once where it matters; don't hedge every sentence. Starting values yo
 - Borrow motion principles, not a reference's identity, logos, copy, or product claims. In editor or screen recordings, analyze the video-inside-the-video separately from the editor or handheld camera.
 - Inspect supplied code before naming elements. Preserve layout, typography, and meaningful behavior unless redesign is requested. Complete the [component and asset intake](references/build-handoff.md#collect-the-component-and-assets) before tying scenes to specific elements; keep ideating while materials are pending.
 - When the user is unavailable and a brand asset is missing, keep going with a clearly labeled placeholder and list the real asset as [open] — never pass off a stand-in as the real thing.
+- Every figure or factual claim on screen or in VO comes from a sourced `claims` entry, never typed into copy ([bind figures to claims](references/build-handoff.md#bind-figures-to-claims)). If a film will be posted, write the credit line from the asset map's pixel sources, not from impressions.
 - Show speed and behavior honestly. Staged motion (a reflow animation, a camera push) is fine; don't imply the product is faster or does more than it does. If you add motion the live UI doesn't have, note it in the element map.
 - Logo-to-pointer is one option, not a default opening. When used, say whether it's a true path morph or a masked substitution.
 - Record accepted decisions and assumptions in `motion-plan.md`; save `timeline.json` when implementation needs it.

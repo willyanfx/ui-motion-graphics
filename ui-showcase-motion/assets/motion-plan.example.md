@@ -12,6 +12,7 @@ Last approved: none. In test: structural timeline only. Next action: inspect the
 - Audience and placement: shoppers, vertical social feed.
 - Canvas and runtime: 1080×1920, 30 fps, 450 frames / 15 seconds.
 - Focus: one filter interaction; calm, precise motion.
+- Palette: light neutral background #F6F6F4 to match a light product grid; primary and accent come from the component's own tokens once supplied.
 - Renderer: Remotion, assuming a React source component is supplied.
 - Story shape: feature proof, ending on a still CTA rather than a seamless loop.
 - Sound: hybrid intent, with tap and confirmation cues planned. No music bed chosen; do not invent a beat grid.
@@ -27,13 +28,20 @@ R04, prior atlas notes at 1.8–9.1 s: borrow a stable camera during an action a
 
 ## 4. Materials and asset map
 
-| Material | Proposed location | State |
-|---|---|---|
-| React grid and styles | ProductGrid.tsx and its imports | Missing; inspect actual supplied files |
-| Fonts | Existing component font sources | Missing; preserve and verify loading |
-| Logo | assets/logo.svg | Missing; no stand-in approved |
-| Product images and sample data | Component fixtures | Missing; use deterministic, labeled demo data |
-| Tap and confirmation | Licensed audio sources to choose | Open |
+| Material | Proposed location | State | Pixel source |
+|---|---|---|---|
+| React grid and styles | ProductGrid.tsx and its imports | Missing; inspect actual supplied files | Live UI rendered in the composition |
+| Fonts | Existing component font sources | Missing; preserve and verify loading | Live UI |
+| Logo | assets/logo.svg | Missing; no stand-in approved | Supplied vector |
+| Product images and sample data | Component fixtures | Missing; use deterministic, labeled demo data | Supplied images inside the live UI |
+| Touch indicator, captions, end-card mask | Authored overlays | Planned | Coded animation |
+| Tap and confirmation | Licensed audio sources to choose | Open | Library audio |
+
+Figures and claims:
+
+| ID | Exact value | Source | Checked | Used in | Status |
+|---|---|---|---|---|---|
+| new-this-week | 24 | Proposed: product feed, new-arrivals count for the capture week | — | S5 benefit caption | open |
 
 ## 5. Element map
 
@@ -55,7 +63,7 @@ All source mappings are **proposed**, including the component name and both sele
 | S2-select-filter | [84, 189) | Camera settles by 108; indicator arrives 124, taps 130; cards settle 151; hold result; indicator gone by 188 |
 | S3-read-result | [189, 243) | Continue the same close view and settled filter state; no entrance or reset |
 | S4-restore-context | [243, 273) | Pull back while retaining the filtered grid |
-| S5-result | [273, 345) | Benefit caption holds 279–333; neutral mask covers UI by 344 |
+| S5-result | [273, 345) | Benefit caption ("{claim:new-this-week} new arrivals, one tap.") holds 279–333; neutral mask covers UI by 344. If the count can't be sourced, drop the figure and keep the timing |
 | S6-end-card | [345, 450) | Logo and CTA settle by 372; hold through frame 449 |
 
 All scenes remain `to direct`; structural validity is not creative approval. The JSON is the canonical source of exact frames.
@@ -74,11 +82,11 @@ S1→S2 removes only the headline. S2→S3→S4→S5 retain the same UI layer. A
 
 ## 9. Open decisions
 
-Resolve the source UI, selectors, fonts, fixture data, logo, feature copy, and licensed audio. Verify safe-area fit in the intended placement. If the actual grid cannot perform the stated filter action, revise the story before implementing it.
+Resolve the source UI, selectors, fonts, fixture data, logo, feature copy, the new-arrivals count, and licensed audio. Verify safe-area fit in the intended placement. If the actual grid cannot perform the stated filter action, revise the story before implementing it.
 
 ## 10. Build prompt
 
-Implement the paired timeline with the inspected React component. Preserve real UI behavior and label any presentation-only reflow. Resolve the proposed targets and missing assets. Mount persistent layers once, derive state from the absolute frame, and apply camera transforms exactly once. Deliver a seekable preview and a draft export; inspect each press, scene boundary, and final frame. Keep status at planned until actual implementation evidence exists.
+Implement the paired timeline with the inspected React component. Preserve real UI behavior and label any presentation-only reflow. Resolve the proposed targets and missing assets. Mount persistent layers once, derive state from the absolute frame, and apply camera transforms exactly once. Read the benefit figure from the `new-this-week` claim. Render the tap and reflow passage (frames 120–155) first and step it frame by frame before the full draft. Deliver a seekable preview and a draft export; inspect each press, scene boundary, and final frame. Keep status at planned until actual implementation evidence exists.
 
 ## 11. Verification plan
 
